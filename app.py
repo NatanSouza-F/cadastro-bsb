@@ -3,37 +3,37 @@ import time
 from datetime import datetime
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  CONFIGURAÇÃO DA PÁGINA E UX/UI GLOBAL (PADRÃO PULSE)                 ║
+# ║  CONFIGURAÇÃO DA PÁGINA E UX/UI GLOBAL (PADRÃO BSB AZUL)              ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
-# CSS importado diretamente da identidade visual do PULSE
+# CSS customizado para a paleta Azul BSB
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
     * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; }
 
-    /* Fundo Dark Mode Radial igual ao Pulse */
+    /* Fundo Dark Mode Radial com tons de azul */
     .stApp {
-        background: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-                    radial-gradient(ellipse at bottom, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+        background: radial-gradient(ellipse at top, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at bottom, rgba(37, 99, 235, 0.05) 0%, transparent 50%),
                     #0b1e2e;
     }
 
     h1, h2, h3, p, span, div, label { color: #f1f5f9; }
 
-    /* Logo BSB com o gradiente do Pulse */
+    /* Logo BSB com gradiente Azul Premium */
     .bsb-logo {
         font-size: 2.4rem;
         font-weight: 900;
-        background: linear-gradient(135deg, #00ff88 0%, #14b8a6 50%, #3b82f6 100%);
+        background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #2563eb 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
         margin: 0;
         letter-spacing: -0.04em;
-        filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.2));
+        filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
     }
     
     .bsb-slogan {
@@ -45,34 +45,34 @@ st.markdown("""
         margin-bottom: 2rem;
     }
 
-    /* Card Principal do Formulário com Neon Glow */
+    /* Card Principal do Formulário com Glow Azul */
     .main-card {
         background: linear-gradient(135deg, #1a2e42 0%, #243b54 100%);
-        border: 1px solid rgba(0, 255, 136, 0.2);
+        border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 20px;
         padding: 2.5rem;
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.05);
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(56, 189, 248, 0.05);
         position: relative;
         overflow: hidden;
         margin-bottom: 2rem;
     }
     
-    /* Borda superior verde neon no card */
+    /* Borda superior azul luminosa no card */
     .main-card::before {
         content: "";
         position: absolute;
         top: 0; left: 0; right: 0;
         height: 3px;
-        background: linear-gradient(90deg, transparent, #00ff88, transparent);
+        background: linear-gradient(90deg, transparent, #38bdf8, transparent);
         opacity: 0.8;
     }
 
     /* Títulos das sessões */
     h3 {
-        color: #00ff88 !important;
+        color: #38bdf8 !important;
         font-size: 1.1rem !important;
         font-weight: 700 !important;
-        border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+        border-bottom: 1px solid rgba(56, 189, 248, 0.15);
         padding-bottom: 8px;
         margin-top: 1rem;
         margin-bottom: 1rem;
@@ -90,8 +90,8 @@ st.markdown("""
     }
     div[data-baseweb="select"] > div:hover, div[data-baseweb="select"] > div:focus-within,
     div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within {
-        border-color: rgba(0, 255, 136, 0.6) !important;
-        box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+        border-color: rgba(56, 189, 248, 0.6) !important;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);
     }
     
     input, select, div[data-baseweb="select"] span { color: #f1f5f9 !important; }
@@ -103,16 +103,16 @@ st.markdown("""
         font-weight: 600 !important;
     }
 
-    /* Botão estilo Pulse CTA */
+    /* Botão estilo CTA Azul */
     div[data-testid="stButton"] button {
-        background: linear-gradient(135deg, #10b981 0%, #00ff88 100%);
-        color: #0b1e2e !important;
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: #ffffff !important;
         font-weight: 800;
         border: none;
         border-radius: 12px;
         padding: 0.75rem 2rem;
         width: 100%;
-        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.25);
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25);
         transition: all 0.3s ease;
         margin-top: 20px;
         text-transform: uppercase;
@@ -120,18 +120,18 @@ st.markdown("""
     }
     div[data-testid="stButton"] button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
-        background: linear-gradient(135deg, #00ff88 0%, #10b981 100%);
+        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+        background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     }
 
     /* Ajuste para Expander (Visão Interna) */
     div[data-testid="stExpander"] {
         background: #1a2e42;
-        border: 1px solid rgba(0, 255, 136, 0.2);
+        border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 12px;
     }
     div[data-testid="stExpander"] summary p {
-        color: #00ff88 !important;
+        color: #38bdf8 !important;
         font-weight: 700;
     }
 </style>
@@ -234,8 +234,9 @@ if st.session_state.cadastro_realizado:
         st.markdown("<p style='color: #94a3b8; font-size: 0.9rem;'>Isso é o que o sistema de Back-office recebe:</p>", unsafe_allow_html=True)
         dados = st.session_state.dados_cliente
         
+        # Mantendo as cores do SCORE baseadas em semântica de risco (verde pra bom, vermelho pra ruim)
         risco = "BAIXO"
-        cor_risco = "#00ff88"
+        cor_risco = "#10b981" 
         recomendacao = "Fluxo padrão de Onboarding. Integração via API do ERP permitida."
         
         if dados['erp'] == "Nenhum / Excel" and dados['faturamento'] in ["R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"]:
@@ -253,7 +254,7 @@ if st.session_state.cadastro_realizado:
             <p style="margin: 0; color: #f1f5f9;"><strong>Faturamento Declarado:</strong> {dados['faturamento']}</p>
             <p style="margin: 0; color: #f1f5f9;"><strong>Sistema Atual:</strong> {dados['erp']}</p>
             <hr style="border-color: #334155;">
-            <h4 style="color: #3b82f6; margin-bottom: 5px;">🤖 Motor de Inteligência</h4>
+            <h4 style="color: #38bdf8; margin-bottom: 5px;">🤖 Motor de Inteligência</h4>
             <p style="margin: 0; color: #f1f5f9;">Score Operacional: <strong style='color: {cor_risco}; font-size: 1.1rem;'>{risco}</strong></p>
             <p style="margin: 0; color: #94a3b8; font-size: 0.85rem;">Ação Recomendada: {recomendacao}</p>
         </div>
