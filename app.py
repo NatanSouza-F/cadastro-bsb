@@ -26,7 +26,7 @@ st.markdown("""
     header[data-testid="stHeader"] { background: transparent; height: 0; }
 
     .block-container {
-        max-width: 540px !important; 
+        max-width: 560px !important; 
         padding: 3rem 1rem 1rem 1rem !important;
     }
 
@@ -128,6 +128,22 @@ st.markdown("""
     }
     div[data-testid="column"] { padding: 0 8px; }
 
+    /* Estilização do Radio Button (Seletor de Perfil) */
+    div.stRadio > div[role="radiogroup"] {
+        background: rgba(11, 30, 46, 0.6);
+        padding: 5px;
+        border-radius: 12px;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        display: flex;
+        gap: 10px;
+    }
+    div.stRadio > div[role="radiogroup"] label {
+        background: transparent !important;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
     /* Inputs Glassmorphism Alto Contraste */
     div[data-baseweb="select"] > div, div[data-baseweb="input"] > div, div[data-baseweb="number-input"] > div {
         background: rgba(11, 30, 46, 0.6) !important; 
@@ -144,14 +160,13 @@ st.markdown("""
         box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
     }
     
-    /* Acessibilidade: Cor do texto digitado mais clara para leitura fácil */
     input, select, div[data-baseweb="select"] span { 
         color: #e2e8f0 !important; 
         font-size: 0.9rem !important; 
         font-weight: 500 !important;
     }
     
-    .stSelectbox label, .stTextInput label, .stNumberInput label {
+    .stSelectbox label, .stTextInput label, .stNumberInput label, .stRadio label {
         color: #94a3b8 !important; font-size: 0.72rem !important; font-weight: 700 !important;
         text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px !important; padding-left: 2px;
     }
@@ -211,6 +226,8 @@ if 'dados_cliente' not in st.session_state:
     st.session_state.dados_cliente = {}
 if 'razao_social_api' not in st.session_state:
     st.session_state.razao_social_api = ""
+if 'nome_fantasia_api' not in st.session_state:
+    st.session_state.nome_fantasia_api = ""
 if 'erro_validacao' not in st.session_state:
     st.session_state.erro_validacao = False
 
@@ -220,35 +237,67 @@ def buscar_cnpj_api():
     
     if len(cnpj_limpo) == 14:
         try:
-            # Integração real e gratuita com BrasilAPI para gerar o "Efeito Uau"
             response = requests.get(f"https://brasilapi.com.br/api/cnpj/v1/{cnpj_limpo}", timeout=5)
             if response.status_code == 200:
                 dados = response.json()
                 st.session_state.razao_social_api = dados.get("razao_social", "")
+                st.session_state.nome_fantasia_api = dados.get("nome_fantasia", "")
                 st.toast("✅ Empresa localizada com sucesso na Receita Federal!")
             else:
                 st.session_state.razao_social_api = ""
+                st.session_state.nome_fantasia_api = ""
         except:
             st.session_state.razao_social_api = ""
+            st.session_state.nome_fantasia_api = ""
     
-    st.session_state.etapa = 2 # Libera a segunda etapa
+    st.session_state.etapa = 2 # Libera a segunda etapa (Apenas PJ)
 
-def processar_envio():
+def avancar_pf():
+    st.session_state.etapa = 2 # Libera a segunda etapa (Para PF)
+
+def processar_envio_pj():
     razao = st.session_state.in_razao
     regime = st.session_state.in_regime
     faturamento = st.session_state.in_fat
-    erp = st.session_state.in_erp
-
+    
     if not razao or regime == "Selecione..." or faturamento == "Selecione...":
         st.session_state.erro_validacao = True
     else:
         st.session_state.erro_validacao = False
         st.session_state.dados_cliente = {
-            "cnpj": st.session_state.in_cnpj,
-            "razao": razao,
+            "tipo_cliente": "Pessoa Jurídica (PJ)",
+            "documento": st.session_state.in_cnpj,
+            "nome_principal": razao,
+            "nome_fantasia": st.session_state.in_fantasia,
+            "contato_wpp": st.session_state.in_wpp,
+            "email": st.session_state.in_email,
+            "funcionarios": st.session_state.in_func,
+            "regime": regime,
             "faturamento": faturamento,
-            "erp": erp,
-            "data": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            "erp": st.session_state.in_erp,
+            "data_cadastro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        }
+        st.session_state.cadastro_realizado = True
+
+def processar_envio_pf():
+    cpf = st.session_state.in_cpf
+    nome = st.session_state.in_nome_pf
+    necessidade = st.session_state.in_necessidade
+    
+    if not cpf or not nome or necessidade == "Selecione...":
+        st.session_state.erro_validacao = True
+    else:
+        st.session_state.erro_validacao = False
+        st.session_state.dados_cliente = {
+            "tipo_cliente": "Pessoa Física (PF)",
+            "documento": cpf,
+            "nome_principal": nome,
+            "contato_wpp": st.session_state.in_wpp_pf,
+            "email": st.session_state.in_email_pf,
+            "profissao": st.session_state.in_prof,
+            "renda_media": st.session_state.in_renda_pf,
+            "necessidade_principal": necessidade,
+            "data_cadastro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         }
         st.session_state.cadastro_realizado = True
 
@@ -257,6 +306,7 @@ def resetar_tela():
     st.session_state.cadastro_realizado = False
     st.session_state.dados_cliente = {}
     st.session_state.razao_social_api = ""
+    st.session_state.nome_fantasia_api = ""
     st.session_state.erro_validacao = False
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
@@ -279,7 +329,7 @@ carousel_html = """
         <div class="carousel-card"><div class="carousel-icon">💰</div><div class="carousel-label">RECUPERAÇÃO DE CRÉDITOS</div><div class="carousel-description">Você sabia que sua empresa pode ter valores pagos indevidamente a serem recuperados?</div></div>
         <div class="carousel-card"><div class="carousel-icon">🧾</div><div class="carousel-label">DEPARTAMENTO FISCAL</div><div class="carousel-description">O cenário tributário brasileiro é desafiador, mas ajudamos na correta apuração e entrega.</div></div>
         <div class="carousel-card"><div class="carousel-icon">👥</div><div class="carousel-label">DEPARTAMENTO PESSOAL</div><div class="carousel-description">Gerenciar pessoas exige atenção constante à legislação trabalhista e previdenciária.</div></div>
-        <div class="carousel-card"><div class="carousel-icon">📊</div><div class="carousel-label">CONTABILIDADE</div><div class="carousel-description">Na BSB Contabilidade, tratamos a contabilidade como uma ferramenta de gestão.</div></div>
+        <div class="carousel-card"><div class="carousel-label">📊</div><div class="carousel-label">CONTABILIDADE</div><div class="carousel-description">Na BSB Contabilidade, tratamos a contabilidade como uma ferramenta de gestão.</div></div>
     </div>
     <div style="text-align: center; color: #64748b; font-size: 0.65rem; margin-top: 155px; opacity: 0.7;">
         👉 Pressione ou passe o mouse no card para pausar a leitura
@@ -290,49 +340,110 @@ if not st.session_state.cadastro_realizado:
     st.markdown(carousel_html, unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  INTERFACE DO FORMULÁRIO (PROGRESSIVE DISCLOSURE)                     ║
+# ║  INTERFACE DO FORMULÁRIO (PROGRESSIVE DISCLOSURE MULTI-PERFIL)        ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 if not st.session_state.cadastro_realizado:
     
-    # ETAPA 1: Identificação (CNPJ)
-    st.markdown("<h3>1. Identificação</h3>", unsafe_allow_html=True)
+    st.markdown("<h3>1. Qual é o seu perfil?</h3>", unsafe_allow_html=True)
     
-    col_cnpj, col_btn = st.columns([3, 1], gap="small")
-    with col_cnpj:
-        st.text_input("CNPJ da Empresa *", placeholder="00.000.000/0000-00", key="in_cnpj")
-    with col_btn:
-        st.button("🔍 Buscar", on_click=buscar_cnpj_api, use_container_width=True)
+    # Seletor de Perfil do Cliente
+    perfil_cliente = st.radio(
+        "Selecione o tipo de cadastro:",
+        ["🏢 Empresa (CNPJ)", "👤 Pessoa Física (CPF)"],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
 
-    # ETAPA 2: Abre apenas se o usuário avançar
-    if st.session_state.etapa == 2:
-        st.markdown("<h3>2. Dados Operacionais</h3>", unsafe_allow_html=True)
+    # =====================================================================
+    # FLUXO: EMPRESA (PJ)
+    # =====================================================================
+    if perfil_cliente == "🏢 Empresa (CNPJ)":
         
-        st.text_input("Razão Social *", value=st.session_state.razao_social_api, placeholder="Sua Empresa LTDA", key="in_razao")
+        col_cnpj, col_btn = st.columns([3, 1], gap="small")
+        with col_cnpj:
+            st.text_input("CNPJ da Empresa *", placeholder="00.000.000/0000-00", key="in_cnpj")
+        with col_btn:
+            st.button("🔍 Buscar", on_click=buscar_cnpj_api, use_container_width=True)
+
+        if st.session_state.etapa == 2:
+            st.markdown("<h3>2. Dados Institucionais e Contato</h3>", unsafe_allow_html=True)
             
-        col3, col4 = st.columns([1, 1], gap="medium")
-        with col3:
-            st.text_input("WhatsApp do Gestor", placeholder="(00) 00000-0000", key="in_wpp")
-        with col4:
-            st.text_input("E-mail Financeiro", placeholder="financeiro@empresa.com", key="in_email")
+            col_r, col_f = st.columns([1, 1], gap="medium")
+            with col_r:
+                st.text_input("Razão Social *", value=st.session_state.razao_social_api, placeholder="Sua Empresa LTDA", key="in_razao")
+            with col_f:
+                st.text_input("Nome Fantasia", value=st.session_state.nome_fantasia_api, placeholder="Como a empresa é conhecida", key="in_fantasia")
+                
+            col3, col4 = st.columns([1, 1], gap="medium")
+            with col3:
+                st.text_input("WhatsApp do Gestor", placeholder="(00) 00000-0000", key="in_wpp")
+            with col4:
+                st.text_input("E-mail Comercial", placeholder="contato@empresa.com", key="in_email")
 
-        col5, col6 = st.columns([1, 1], gap="medium")
-        with col5:
-            st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real"], key="in_regime")
-            st.selectbox("Sistema de Gestão (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"], key="in_erp")
-        with col6:
-            st.selectbox("Faturamento Médio Mensal", ["Selecione...", "Até R$ 20.000", "R$ 20.001 a R$ 100.000", "R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"], key="in_fat")
-            st.number_input("Volume NFs emitidas/mês", min_value=0, step=10, key="in_notas")
+            st.markdown("<h3>3. Informações Operacionais</h3>", unsafe_allow_html=True)
+            
+            col_reg, col_func = st.columns([1, 1], gap="medium")
+            with col_reg:
+                st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real", "Não sei / MEI"], key="in_regime")
+            with col_func:
+                st.selectbox("Quantidade de Funcionários (Folha/DP)", ["Nenhum (Sócios)", "1 a 5 funcionários", "6 a 20 funcionários", "Mais de 20 funcionários"], key="in_func")
 
-        if st.session_state.erro_validacao:
-            st.markdown("""
-            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; margin-top: 10px;">
-                ⚠️ Por favor, preencha todos os campos obrigatórios (*).
-            </div>
-            """, unsafe_allow_html=True)
+            col5, col6 = st.columns([1, 1], gap="medium")
+            with col5:
+                st.selectbox("Faturamento Médio Mensal", ["Selecione...", "Até R$ 20.000", "R$ 20.001 a R$ 100.000", "R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"], key="in_fat")
+            with col6:
+                st.selectbox("Sistema de Gestão (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"], key="in_erp")
 
-        st.button("Finalizar Cadastro Seguro", on_click=processar_envio, type="primary")
+            if st.session_state.erro_validacao:
+                st.markdown('<div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; margin-top: 10px;">⚠️ Por favor, preencha todos os campos obrigatórios (*).</div>', unsafe_allow_html=True)
+
+            st.button("Finalizar Cadastro Seguro", on_click=processar_envio_pj, type="primary")
+
+    # =====================================================================
+    # FLUXO: PESSOA FÍSICA (PF)
+    # =====================================================================
+    elif perfil_cliente == "👤 Pessoa Física (CPF)":
         
-        # Selo Trust & Compliance (LGPD)
+        col_cpf, col_nome = st.columns([1, 2], gap="medium")
+        with col_cpf:
+            st.text_input("CPF *", placeholder="000.000.000-00", key="in_cpf")
+        with col_nome:
+            st.text_input("Nome Completo *", placeholder="Digite seu nome", key="in_nome_pf")
+
+        st.button("Avançar", on_click=avancar_pf, use_container_width=True)
+
+        if st.session_state.etapa == 2:
+            st.markdown("<h3>2. Contato e Perfil</h3>", unsafe_allow_html=True)
+            
+            col_c1, col_c2 = st.columns([1, 1], gap="medium")
+            with col_c1:
+                st.text_input("WhatsApp", placeholder="(00) 00000-0000", key="in_wpp_pf")
+            with col_c2:
+                st.text_input("E-mail Pessoal", placeholder="seuemail@gmail.com", key="in_email_pf")
+
+            st.markdown("<h3>3. Qual a sua necessidade?</h3>", unsafe_allow_html=True)
+
+            col_p1, col_p2 = st.columns([1, 1], gap="medium")
+            with col_p1:
+                st.text_input("Profissão / Ocupação Principal", placeholder="Ex: Médico, Advogado, Autônomo...", key="in_prof")
+            with col_p2:
+                st.selectbox("Renda Média Mensal", ["Até R$ 3.000", "R$ 3.001 a R$ 8.000", "R$ 8.001 a R$ 15.000", "Acima de R$ 15.000"], key="in_renda_pf")
+
+            st.selectbox("Como a BSB pode te ajudar hoje? *", [
+                "Selecione...", 
+                "Declaração de Imposto de Renda (IRPF)", 
+                "Cálculo de Carnê Leão / Autônomo", 
+                "Quero abrir uma Empresa (Transformar em PJ)", 
+                "Planejamento Tributário / Outros"
+            ], key="in_necessidade")
+
+            if st.session_state.erro_validacao:
+                st.markdown('<div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; margin-top: 10px;">⚠️ Por favor, preencha todos os campos obrigatórios (*).</div>', unsafe_allow_html=True)
+
+            st.button("Finalizar Cadastro Seguro", on_click=processar_envio_pf, type="primary")
+
+    # Selo Trust & Compliance (LGPD) - Comum a ambos
+    if st.session_state.etapa == 2:
         st.markdown("""
         <div class="lgpd-badge">
             <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
@@ -344,44 +455,33 @@ if not st.session_state.cadastro_realizado:
 # ║  TELA DE SUCESSO                                                      ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 else:
-    with st.spinner("Criptografando e processando dados..."):
+    with st.spinner("Criptografando e estruturando dados..."):
         time.sleep(1.5)
-    st.success(f"✅ Cadastro finalizado com sucesso! Nossa equipe analisará seus dados e entrará em contato.")
-    st.info("A BSB Contabilidade agradece a confiança. Um consultor enviará os próximos passos no seu WhatsApp.")
+    st.success(f"✅ Ficha de Cadastro estruturada com sucesso!")
+    st.info("A BSB Contabilidade agradece a confiança. Nossa equipe técnica analisará seus dados e entrará em contato.")
     st.balloons()
     
     st.button("⬅️ Novo Cadastro (Modo Demo)", on_click=resetar_tela)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  EASTER EGG: MOTOR DE RISCO DO BACK-OFFICE (LÓGICA AVANÇADA)          ║
+# ║  EASTER EGG: ESTRUTURAÇÃO DE DADOS (VISÃO INTERNA/BANCO DE DADOS)     ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 if st.session_state.cadastro_realizado:
-    with st.expander("🔒 VISÃO INTERNA BSB (Mostrar na Reunião)"):
-        st.markdown("<p style='color: #94a3b8; font-size: 0.9rem;'>Processamento SQL simulado pós-captação:</p>", unsafe_allow_html=True)
+    with st.expander("🔒 VISÃO INTERNA DO BANCO DE DADOS (Mostrar na Reunião)"):
+        st.markdown("<p style='color: #94a3b8; font-size: 0.85rem;'>Este é o formato JSON estruturado pronto para ser enviado ao Banco de Dados Relacional (PostgreSQL/MySQL) do escritório, sem necessidade de digitação humana:</p>", unsafe_allow_html=True)
+        
         dados = st.session_state.dados_cliente
         
-        # Motor de Score Logico (Categorização de Risco: Baixo a Crítico)
-        risco = "BAIXO"
-        cor_risco = "#10b981" 
-        recomendacao = "Fluxo padrão liberado. Setup simplificado."
+        # Exibe os dados de forma limpa como se fosse um JSON para o cliente entender a "mágica"
+        st.json(dados)
         
-        if dados['erp'] == "Nenhum / Excel" and dados['faturamento'] in ["R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"]:
-            risco = "CRÍTICO"
-            cor_risco = "#ef4444"
-            recomendacao = "Atenção: Alto volume sem ERP. Exige capping manual. Acionar matriz de risco."
-        elif dados['erp'] == "Nenhum / Excel":
-            risco = "MÉDIO"
-            cor_risco = "#f59e0b"
-            recomendacao = "Normalização necessária. Implantar Conta Azul pré-onboarding."
-
-        st.markdown(f"""
-        <div style="background: #0b1e2e; padding: 15px; border-radius: 10px; border: 1px solid #334155;">
-            <p style="margin: 0; color: #f1f5f9;"><strong>Lead Capturado:</strong> {dados['razao']} ({dados['cnpj']})</p>
-            <p style="margin: 0; color: #f1f5f9;"><strong>Faturamento:</strong> {dados['faturamento']}</p>
-            <p style="margin: 0; color: #f1f5f9;"><strong>Fonte de Dados:</strong> {dados['erp']}</p>
-            <hr style="border-color: #334155;">
-            <h4 style="color: #38bdf8; margin-bottom: 5px;">🤖 Motor de Score Analítico</h4>
-            <p style="margin: 0; color: #f1f5f9;">Classificação de Risco Operacional: <strong style='color: {cor_risco}; font-size: 1.1rem;'>{risco}</strong></p>
-            <p style="margin: 0; color: #94a3b8; font-size: 0.85rem;">Diretriz do Sistema: {recomendacao}</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("<hr style='border-color: #334155;'>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #38bdf8; margin-bottom: 5px;'>🤖 Automação Operacional</h4>", unsafe_allow_html=True)
+        
+        if dados['tipo_cliente'] == "Pessoa Jurídica (PJ)":
+            st.markdown(f"<p style='color: #f1f5f9; font-size: 0.9rem;'>Lead PJ capturado. Alerta enviado ao setor <strong>Societário / Fiscal</strong>.</p>", unsafe_allow_html=True)
+        else:
+            if "abrir uma Empresa" in dados['necessidade_principal']:
+                st.markdown(f"<p style='color: #10b981; font-size: 0.9rem;'><strong>ALERTA DE VENDA:</strong> Cliente deseja transformar CPF em CNPJ. Notificar o time Societário/Comercial imediatamente.</p>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<p style='color: #f1f5f9; font-size: 0.9rem;'>Lead PF capturado. Alerta enviado ao setor de <strong>Imposto de Renda / Assessoria Pessoal</strong>.</p>", unsafe_allow_html=True)
