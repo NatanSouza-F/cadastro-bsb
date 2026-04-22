@@ -257,49 +257,36 @@ st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=Tru
 st.markdown('<p class="bsb-slogan">Bem-vindo! Para darmos continuidade, precisamos realizar o seu cadastro financeiro.</p>', unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  CARROSSEL DE SERVIÇOS 3D (5 Itens Oficiais da BSB)                   ║
+# ║  CARROSSEL DE SERVIÇOS 3D (Bloco HTML puro injetado via Python)       ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
-SERVICES = [
-    {
-        "icon": "🏢",
-        "label": "SOCIETÁRIO",
-        "description": "Todo negócio precisa estar juridicamente em dia para garantir segurança e conformidade operacional."
-    },
-    {
-        "icon": "💰",
-        "label": "RECUPERAÇÃO DE CRÉDITOS",
-        "description": "Você sabia que sua empresa pode ter valores pagos indevidamente a serem recuperados?"
-    },
-    {
-        "icon": "🧾",
-        "label": "DEPARTAMENTO FISCAL",
-        "description": "O cenário tributário brasileiro é desafiador, mas ajudamos na correta apuração e entrega."
-    },
-    {
-        "icon": "👥",
-        "label": "DEPARTAMENTO PESSOAL",
-        "description": "Gerenciar pessoas exige atenção constante à legislação trabalhista e previdenciária."
-    },
-    {
-        "icon": "📊",
-        "label": "CONTABILIDADE",
-        "description": "Na BSB Contabilidade, tratamos a contabilidade como uma ferramenta de gestão."
-    }
-]
-
 carousel_html = """
 <div class="carousel-wrapper">
     <div class="carousel-track">
-"""
-for service in SERVICES:
-    carousel_html += f"""
         <div class="carousel-card">
-            <div class="carousel-icon">{service['icon']}</div>
-            <div class="carousel-label">{service['label']}</div>
-            <div class="carousel-description">{service['description']}</div>
+            <div class="carousel-icon">🏢</div>
+            <div class="carousel-label">SOCIETÁRIO</div>
+            <div class="carousel-description">Todo negócio precisa estar juridicamente em dia para garantir segurança e conformidade operacional.</div>
         </div>
-    """
-carousel_html += """
+        <div class="carousel-card">
+            <div class="carousel-icon">💰</div>
+            <div class="carousel-label">RECUPERAÇÃO DE CRÉDITOS</div>
+            <div class="carousel-description">Você sabia que sua empresa pode ter valores pagos indevidamente a serem recuperados?</div>
+        </div>
+        <div class="carousel-card">
+            <div class="carousel-icon">🧾</div>
+            <div class="carousel-label">DEPARTAMENTO FISCAL</div>
+            <div class="carousel-description">O cenário tributário brasileiro é desafiador, mas ajudamos na correta apuração e entrega.</div>
+        </div>
+        <div class="carousel-card">
+            <div class="carousel-icon">👥</div>
+            <div class="carousel-label">DEPARTAMENTO PESSOAL</div>
+            <div class="carousel-description">Gerenciar pessoas exige atenção constante à legislação trabalhista e previdenciária.</div>
+        </div>
+        <div class="carousel-card">
+            <div class="carousel-icon">📊</div>
+            <div class="carousel-label">CONTABILIDADE</div>
+            <div class="carousel-description">Na BSB Contabilidade, tratamos a contabilidade como uma ferramenta de gestão.</div>
+        </div>
     </div>
 </div>
 """
