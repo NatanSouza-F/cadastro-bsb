@@ -3,41 +3,143 @@ import time
 from datetime import datetime
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  CONFIGURAÇÃO DA PÁGINA E UX/UI GLOBAL                                ║
+# ║  CONFIGURAÇÃO DA PÁGINA E UX/UI GLOBAL (PADRÃO PULSE)                 ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
+# CSS importado diretamente da identidade visual do PULSE
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    * { font-family: 'Inter', sans-serif !important; }
-    .stApp { background-color: #f8fafc; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-    /* Estilizando para parecer um app moderno */
-    .main-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important; }
+
+    /* Fundo Dark Mode Radial igual ao Pulse */
+    .stApp {
+        background: radial-gradient(ellipse at top, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at bottom, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                    #0b1e2e;
+    }
+
+    h1, h2, h3, p, span, div, label { color: #f1f5f9; }
+
+    /* Logo BSB com o gradiente do Pulse */
+    .bsb-logo {
+        font-size: 2.4rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #00ff88 0%, #14b8a6 50%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin: 0;
+        letter-spacing: -0.04em;
+        filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.2));
+    }
+    
+    .bsb-slogan {
+        text-align: center;
+        color: #94a3b8 !important;
+        font-size: 1rem;
+        font-weight: 500;
+        margin-top: 8px;
         margin-bottom: 2rem;
     }
-    h1 { color: #0f172a; text-align: center; font-weight: 800; font-size: 2.2rem; padding-bottom: 0; }
-    .subtitle { color: #64748b; text-align: center; font-size: 1rem; margin-bottom: 2rem; }
-    h3 { color: #0284c7 !important; font-size: 1.1rem !important; font-weight: 600 !important; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-top: 1rem; margin-bottom: 1rem; }
-    
-    /* Botões */
-    div[data-testid="stButton"] button {
-        background-color: #0284c7; color: white; font-weight: 600; border: none; border-radius: 6px; padding: 0.75rem 2rem; width: 100%; transition: all 0.2s ease; margin-top: 15px;
+
+    /* Card Principal do Formulário com Neon Glow */
+    .main-card {
+        background: linear-gradient(135deg, #1a2e42 0%, #243b54 100%);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 255, 136, 0.05);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
     }
-    div[data-testid="stButton"] button:hover { background-color: #0369a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); color: white; }
+    
+    /* Borda superior verde neon no card */
+    .main-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #00ff88, transparent);
+        opacity: 0.8;
+    }
+
+    /* Títulos das sessões */
+    h3 {
+        color: #00ff88 !important;
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+        padding-bottom: 8px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    /* Estilização dos Inputs Dark */
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="input"] > div {
+        background: #0b1e2e !important;
+        border: 1px solid #334155 !important;
+        border-radius: 10px !important;
+        color: #f1f5f9 !important;
+    }
+    div[data-baseweb="select"] > div:hover, div[data-baseweb="select"] > div:focus-within,
+    div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within {
+        border-color: rgba(0, 255, 136, 0.6) !important;
+        box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+    }
+    
+    input, select, div[data-baseweb="select"] span { color: #f1f5f9 !important; }
+    
+    /* Cor dos labels dos inputs */
+    .stSelectbox label, .stTextInput label, .stNumberInput label {
+        color: #94a3b8 !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+    }
+
+    /* Botão estilo Pulse CTA */
+    div[data-testid="stButton"] button {
+        background: linear-gradient(135deg, #10b981 0%, #00ff88 100%);
+        color: #0b1e2e !important;
+        font-weight: 800;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem 2rem;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.25);
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    div[data-testid="stButton"] button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+        background: linear-gradient(135deg, #00ff88 0%, #10b981 100%);
+    }
+
+    /* Ajuste para Expander (Visão Interna) */
+    div[data-testid="stExpander"] {
+        background: #1a2e42;
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 12px;
+    }
+    div[data-testid="stExpander"] summary p {
+        color: #00ff88 !important;
+        font-weight: 700;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
 # ║  GERENCIAMENTO DE ESTADO E CALLBACKS (A BLINDAGEM)                    ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
-# Inicializa as variáveis se não existirem
 if 'cadastro_realizado' not in st.session_state:
     st.session_state.cadastro_realizado = False
 if 'dados_cliente' not in st.session_state:
@@ -45,9 +147,7 @@ if 'dados_cliente' not in st.session_state:
 if 'erro_validacao' not in st.session_state:
     st.session_state.erro_validacao = False
 
-# Callback: Roda ANTES da interface ser redesenhada
 def processar_envio():
-    # Puxa os dados direto das keys dos inputs
     cnpj = st.session_state.in_cnpj
     razao = st.session_state.in_razao
     regime = st.session_state.in_regime
@@ -58,7 +158,7 @@ def processar_envio():
         st.session_state.erro_validacao = True
     else:
         st.session_state.erro_validacao = False
-        time.sleep(1.5) # Simula o processamento
+        time.sleep(1.5)
         st.session_state.dados_cliente = {
             "cnpj": cnpj,
             "razao": razao,
@@ -68,21 +168,22 @@ def processar_envio():
         }
         st.session_state.cadastro_realizado = True
 
-# Callback: Reseta a tela
 def resetar_tela():
     st.session_state.cadastro_realizado = False
     st.session_state.dados_cliente = {}
     st.session_state.erro_validacao = False
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  INTERFACE VISUAL                                                     ║
+# ║  CABEÇALHO DA TELA                                                    ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
-st.markdown("<h1>BSB Contabilidade</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Digital Onboarding - BPO Financeiro</div>", unsafe_allow_html=True)
+st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=True)
+st.markdown('<p class="bsb-slogan">Bem-vindo! Para darmos continuidade, precisamos realizar o seu cadastro financeiro.</p>', unsafe_allow_html=True)
 
-# Envolvemos tudo numa div com classe CSS para ficar bonito
 st.markdown('<div class="main-card">', unsafe_allow_html=True)
 
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  INTERFACE DO FORMULÁRIO                                              ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
 if not st.session_state.cadastro_realizado:
     st.markdown("<h3>1. Dados da Empresa</h3>", unsafe_allow_html=True)
     
@@ -95,3 +196,65 @@ if not st.session_state.cadastro_realizado:
     col3, col4 = st.columns(2)
     with col3:
         st.text_input("WhatsApp do Gestor", placeholder="(00) 00000-0000", key="in_wpp")
+    with col4:
+        st.text_input("E-mail Financeiro", placeholder="financeiro@empresa.com", key="in_email")
+
+    st.markdown("<h3>2. Perfil Operacional</h3>", unsafe_allow_html=True)
+    
+    col5, col6 = st.columns(2)
+    with col5:
+        st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real"], key="in_regime")
+        st.selectbox("Sistema de Gestão Atual (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"], key="in_erp")
+    with col6:
+        st.selectbox("Faturamento Médio Mensal", ["Selecione...", "Até R$ 20.000", "R$ 20.001 a R$ 100.000", "R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"], key="in_fat")
+        st.number_input("Volume médio de NFs emitidas/mês", min_value=0, step=10, key="in_notas")
+
+    if st.session_state.erro_validacao:
+        st.error("⚠️ Por favor, preencha os campos obrigatórios (*).")
+
+    st.button("Finalizar Cadastro", on_click=processar_envio)
+
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  TELA DE SUCESSO                                                      ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
+else:
+    st.success(f"✅ Cadastro finalizado com sucesso! Nossa equipe analisará seus dados e entrará em contato.")
+    st.info("A BSB Contabilidade agradece a confiança. Um consultor enviará os próximos passos no seu WhatsApp.")
+    st.balloons()
+    
+    st.button("⬅️ Novo Cadastro (Modo Demo)", on_click=resetar_tela)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  EASTER EGG: VISÃO INTERNA PARA A SUA REUNIÃO                         ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
+if st.session_state.cadastro_realizado:
+    with st.expander("🔒 VISÃO INTERNA BSB (Mostrar na Reunião)"):
+        st.markdown("<p style='color: #94a3b8; font-size: 0.9rem;'>Isso é o que o sistema de Back-office recebe:</p>", unsafe_allow_html=True)
+        dados = st.session_state.dados_cliente
+        
+        risco = "BAIXO"
+        cor_risco = "#00ff88"
+        recomendacao = "Fluxo padrão de Onboarding. Integração via API do ERP permitida."
+        
+        if dados['erp'] == "Nenhum / Excel" and dados['faturamento'] in ["R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"]:
+            risco = "CRÍTICO"
+            cor_risco = "#ef4444"
+            recomendacao = "Atenção: Alto volume financeiro sem sistema de gestão. Necessário cobrar taxa extra de setup para organização de passivo."
+        elif dados['erp'] == "Nenhum / Excel":
+            risco = "MÉDIO"
+            cor_risco = "#f59e0b"
+            recomendacao = "Cliente desestruturado. Necessário implantar Conta Azul ou Omie antes de iniciar o BPO."
+
+        st.markdown(f"""
+        <div style="background: #0b1e2e; padding: 15px; border-radius: 10px; border: 1px solid #334155;">
+            <p style="margin: 0; color: #f1f5f9;"><strong>Novo Lead:</strong> {dados['razao']} ({dados['cnpj']})</p>
+            <p style="margin: 0; color: #f1f5f9;"><strong>Faturamento Declarado:</strong> {dados['faturamento']}</p>
+            <p style="margin: 0; color: #f1f5f9;"><strong>Sistema Atual:</strong> {dados['erp']}</p>
+            <hr style="border-color: #334155;">
+            <h4 style="color: #3b82f6; margin-bottom: 5px;">🤖 Motor de Inteligência</h4>
+            <p style="margin: 0; color: #f1f5f9;">Score Operacional: <strong style='color: {cor_risco}; font-size: 1.1rem;'>{risco}</strong></p>
+            <p style="margin: 0; color: #94a3b8; font-size: 0.85rem;">Ação Recomendada: {recomendacao}</p>
+        </div>
+        """, unsafe_allow_html=True)
