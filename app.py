@@ -3,11 +3,11 @@ import time
 from datetime import datetime
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  CONFIGURAÇÃO DA PÁGINA E UX/UI GLOBAL (PADRÃO BSB AZUL)              ║
+# ║  CONFIGURAÇÃO DA PÁGINA E UX/UI GLOBAL (PADRÃO BSB AZUL PREMIUM)      ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
-# CSS customizado para a paleta Azul BSB
+# CSS customizado para a paleta Azul BSB com animações padrão PULSE
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -21,7 +21,14 @@ st.markdown("""
                     #0b1e2e;
     }
 
-    h1, h2, h3, p, span, div, label { color: #f1f5f9; }
+    header[data-testid="stHeader"] { background: transparent; height: 0; }
+
+    .block-container {
+        max-width: 480px !important;
+        padding: 3rem 1rem 1rem 1rem !important;
+    }
+
+    h1, h2, h3, h4, p, span, div, label { color: #f1f5f9; }
 
     /* Logo BSB com gradiente Azul Premium */
     .bsb-logo {
@@ -43,6 +50,78 @@ st.markdown("""
         font-weight: 500;
         margin-top: 8px;
         margin-bottom: 2rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CARROSSEL 3D ANIMADO — Estilo premium adapted for BSB services
+       ═══════════════════════════════════════════════════════════════ */
+    .carousel-wrapper {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        margin: 16px 0 24px 0;
+        perspective: 1200px;
+        overflow: hidden;
+    }
+    .carousel-track {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+    }
+    .carousel-card {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 280px;
+        height: 160px;
+        margin-left: -140px;
+        background: linear-gradient(135deg, #1a2e42 0%, #243b54 100%);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 20px;
+        padding: 20px 24px;
+        box-shadow: 0 20px 40px rgba(56, 189, 248, 0.15), 0 0 0 1px rgba(56, 189, 248, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        opacity: 0;
+        animation: carousel-rotate 20s infinite ease-in-out;
+    }
+    .carousel-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+        opacity: 0.8;
+    }
+    .carousel-card:nth-child(1) { animation-delay: 0s; }
+    .carousel-card:nth-child(2) { animation-delay: 5s; }
+    .carousel-card:nth-child(3) { animation-delay: 10s; }
+    .carousel-card:nth-child(4) { animation-delay: 15s; }
+
+    @keyframes carousel-rotate {
+        0%, 100% { opacity: 0; transform: translateX(0) rotateY(90deg) scale(0.8); }
+        5% { opacity: 1; transform: translateX(0) rotateY(0deg) scale(1); }
+        20% { opacity: 1; transform: translateX(0) rotateY(0deg) scale(1); }
+        25% { opacity: 0; transform: translateX(-100%) rotateY(-90deg) scale(0.8); }
+    }
+
+    .carousel-icon { font-size: 1.8rem; line-height: 1; }
+    .carousel-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #38bdf8 !important;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: -10px;
+    }
+    .carousel-description {
+        font-size: 0.8rem;
+        color: #f1f5f9 !important;
+        font-weight: 400;
+        margin: 4px 0;
+        text-shadow: none;
     }
 
     /* Card Principal do Formulário com Glow Azul */
@@ -174,11 +253,61 @@ def resetar_tela():
     st.session_state.erro_validacao = False
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  CABEÇALHO DA TELA                                                    ║
+# ║  CABEÇALHO DA TELA E SAUDAÇÃO                                         ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=True)
 st.markdown('<p class="bsb-slogan">Bem-vindo! Para darmos continuidade, precisamos realizar o seu cadastro financeiro.</p>', unsafe_allow_html=True)
 
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  CARROSSEL DE SERVIÇOS 3D — High Standard                            ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
+# Data de serviços BSB (fictícia mas baseada em site contábil)
+SERVICES = [
+    {
+        "icon": "📊",
+        "label": "ASSESSORIA CONTÁBIL",
+        "description": "Organização da documentação contábil, emissão de balanços, balancetes e demonstrações financeiras."
+    },
+    {
+        "icon": "📝",
+        "label": "GESTÃO TRIBUTÁRIA",
+        "description": "Planejamento tributário, apuração de impostos e entrega de obrigações acessórias."
+    },
+    {
+        "icon": "👥",
+        "label": "DEPARTAMENTO PESSOAL",
+        "description": "Gestão da folha de pagamento, férias, décimo terceiro, admissões e demissões."
+    },
+    {
+        "icon": "🚀",
+        "label": "ABERTURA DE EMPRESA",
+        "description": "Formalização completa de empresas, obtenção de CNPJ e alvarás."
+    }
+]
+
+# Criando o HTML do carrossel dinamicamente com base nos dados
+carousel_html = """
+<div class="carousel-wrapper">
+    <div class="carousel-track">
+"""
+for service in SERVICES:
+    carousel_html += f"""
+        <div class="carousel-card">
+            <div class="carousel-icon">{service['icon']}</div>
+            <div class="carousel-label">{service['label']}</div>
+            <div class="carousel-description">{service['description']}</div>
+        </div>
+    """
+carousel_html += """
+    </div>
+</div>
+"""
+
+# Renderiza o carrossel na página inicial
+if not st.session_state.cadastro_realizado:
+    st.markdown(carousel_html, unsafe_allow_html=True)
+
+# Container principal após o carrossel
 st.markdown('<div class="main-card">', unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
