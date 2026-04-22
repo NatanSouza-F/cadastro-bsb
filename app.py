@@ -7,7 +7,7 @@ from datetime import datetime
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
-# CSS customizado com correções de Padding e Alinhamento Vertical
+# CSS customizado com alinhamento perfeito de inputs e nova hierarquia
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -43,13 +43,16 @@ st.markdown("""
         filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
     }
     
+    /* Nova Saudação - Mais presença e respiro */
     .bsb-slogan {
         text-align: center;
         color: #94a3b8 !important;
-        font-size: 1rem;
+        font-size: 1.05rem;
         font-weight: 500;
-        margin-top: 8px;
-        margin-bottom: 1rem;
+        line-height: 1.5;
+        margin-top: 12px;
+        margin-bottom: 2rem; /* Empurra o carrossel mais para baixo */
+        padding: 0 10px;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -59,7 +62,7 @@ st.markdown("""
         position: relative;
         width: 100%;
         height: 180px;
-        margin: 10px 0 30px 0;
+        margin: 10px 0 40px 0; /* Mais margem embaixo para separar do form */
         perspective: 1200px;
         overflow: hidden;
     }
@@ -141,19 +144,19 @@ st.markdown("""
        UI NASA: FORMULÁRIO, INPUTS E TIPOGRAFIA
        ═══════════════════════════════════════════════════════════════ */
     
-    /* CORREÇÃO 1: Títulos de Sessão mais afastados da borda esquerda */
+    /* Títulos de Sessão (Badges) */
     h3 {
         display: inline-block;
         background: rgba(56, 189, 248, 0.1);
         color: #38bdf8 !important;
-        padding: 10px 20px 10px 24px !important; /* 24px de respiro à esquerda */
+        padding: 10px 20px 10px 24px !important; 
         border-radius: 8px;
         font-size: 0.85rem !important;
         font-weight: 800 !important;
         letter-spacing: 0.15em;
         text-transform: uppercase;
         border-left: 4px solid #38bdf8;
-        margin-top: 2rem !important;
+        margin-top: 1rem !important;
         margin-bottom: 1.5rem !important;
         box-shadow: 0 4px 15px rgba(56, 189, 248, 0.05);
     }
@@ -162,28 +165,32 @@ st.markdown("""
         padding: 0 8px;
     }
 
-    /* CORREÇÃO 2: Inputs com altura mínima para evitar corte de texto */
+    /* CORREÇÃO: Inputs usando alturas e alinhamentos nativos (sem esmagar) */
     div[data-baseweb="select"] > div,
-    div[data-baseweb="input"] > div {
+    div[data-baseweb="input"] > div,
+    div[data-baseweb="number-input"] > div {
         background: rgba(11, 30, 46, 0.6) !important; 
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(148, 163, 184, 0.2) !important; 
-        border-radius: 12px !important; 
-        min-height: 48px !important; /* Força uma altura maior e padronizada */
+        border: 1px solid rgba(148, 163, 184, 0.3) !important; 
+        border-radius: 10px !important; 
         color: #f1f5f9 !important;
         transition: all 0.3s ease;
     }
     
     div[data-baseweb="select"] > div:hover, div[data-baseweb="select"] > div:focus-within,
-    div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within {
+    div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within,
+    div[data-baseweb="number-input"] > div:hover, div[data-baseweb="number-input"] > div:focus-within {
         background: rgba(11, 30, 46, 0.9) !important;
         border-color: rgba(56, 189, 248, 0.8) !important;
-        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
-        transform: translateY(-1px);
+        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
     }
     
-    input, select, div[data-baseweb="select"] span { color: #f1f5f9 !important; font-size: 0.95rem !important;}
+    input, select, div[data-baseweb="select"] span { 
+        color: #f1f5f9 !important; 
+        font-size: 0.9rem !important; /* Ajuste sutil para não vazar a caixa */
+    }
     
+    /* Labels dos campos */
     .stSelectbox label, .stTextInput label, .stNumberInput label {
         color: #94a3b8 !important;
         font-size: 0.72rem !important;
@@ -271,7 +278,13 @@ def resetar_tela():
 # ║  CABEÇALHO DA TELA E SAUDAÇÃO                                         ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=True)
-st.markdown('<p class="bsb-slogan">Bem-vindo! Para darmos continuidade, precisamos realizar o seu cadastro financeiro.</p>', unsafe_allow_html=True)
+
+# A nova saudação exatamente onde você pediu, atualizada e com alinhamento perfeito.
+st.markdown("""
+<p class="bsb-slogan">
+    Seja bem-vindo(a)! Para darmos continuidade ao seu processo, solicitamos o preenchimento das informações a seguir:
+</p>
+""", unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
 # ║  CARROSSEL DE SERVIÇOS 3D                                             ║
@@ -315,7 +328,7 @@ if not st.session_state.cadastro_realizado:
     st.markdown(carousel_html, unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  INTERFACE DO FORMULÁRIO (DESIGN NASA)                                ║
+# ║  INTERFACE DO FORMULÁRIO (PADRÃO CORRIGIDO)                           ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 if not st.session_state.cadastro_realizado:
     
