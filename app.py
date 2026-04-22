@@ -128,7 +128,6 @@ st.markdown("""
     }
     div[data-testid="column"] { padding: 0 8px; }
 
-    /* Estilização do Radio Button (Seletor de Perfil) */
     div.stRadio > div[role="radiogroup"] {
         background: rgba(11, 30, 46, 0.6); padding: 5px; border-radius: 12px;
         border: 1px solid rgba(56, 189, 248, 0.3); display: flex; gap: 10px;
@@ -137,7 +136,6 @@ st.markdown("""
         background: transparent !important; padding: 10px 20px; border-radius: 8px; transition: all 0.3s ease;
     }
 
-    /* Inputs Glassmorphism Alto Contraste */
     div[data-baseweb="select"] > div, div[data-baseweb="input"] > div, div[data-baseweb="number-input"] > div {
         background: rgba(11, 30, 46, 0.6) !important; backdrop-filter: blur(10px);
         border: 1px solid rgba(148, 163, 184, 0.3) !important; border-radius: 10px !important; transition: all 0.3s ease;
@@ -150,20 +148,56 @@ st.markdown("""
     }
     
     input, select, div[data-baseweb="select"] span { color: #e2e8f0 !important; font-size: 0.9rem !important; font-weight: 500 !important; }
+    
     .stSelectbox label, .stTextInput label, .stNumberInput label, .stRadio label, .stCameraInput label {
         color: #94a3b8 !important; font-size: 0.72rem !important; font-weight: 700 !important;
         text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px !important; padding-left: 2px;
     }
 
-    /* Estilização Câmera (Streamlit native camera widget) */
+    /* ═══════════════════════════════════════════════════════════════
+       HACK VISUAL: CÂMERA DE ALTO PADRÃO (KYC)
+       ═══════════════════════════════════════════════════════════════ */
+    /* Container principal da Câmera */
     div[data-testid="stCameraInput"] {
-        background: rgba(11, 30, 46, 0.4);
-        border: 1px dashed rgba(56, 189, 248, 0.5);
-        border-radius: 12px;
-        padding: 10px;
+        background: rgba(11, 30, 46, 0.4) !important;
+        border: 1px solid rgba(56, 189, 248, 0.2) !important;
+        border-radius: 16px !important;
+        padding: 16px !important;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2) !important;
+        margin-top: 10px !important;
     }
 
-    /* Botão Secundário (API Buscar) */
+    /* Arredondando o feed de vídeo e a imagem capturada */
+    div[data-testid="stCameraInput"] video,
+    div[data-testid="stCameraInput"] img {
+        border-radius: 12px !important;
+        border: 1px solid rgba(148, 163, 184, 0.1) !important;
+    }
+
+    /* Botão Take Photo nativo hackeado */
+    div[data-testid="stCameraInput"] button {
+        background: rgba(56, 189, 248, 0.1) !important;
+        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+        color: #38bdf8 !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.1em !important;
+        padding: 8px 16px !important;
+        margin-top: 12px !important;
+        transition: all 0.3s ease !important;
+    }
+
+    div[data-testid="stCameraInput"] button:hover {
+        background: rgba(56, 189, 248, 0.25) !important;
+        border-color: rgba(56, 189, 248, 0.6) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2) !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       BOTÕES PADRÃO
+       ═══════════════════════════════════════════════════════════════ */
     button[kind="secondary"] {
         background: rgba(56, 189, 248, 0.1) !important; border: 1px solid rgba(56, 189, 248, 0.4) !important;
         color: #38bdf8 !important; border-radius: 10px !important; margin-top: 28px !important;
@@ -171,7 +205,6 @@ st.markdown("""
     }
     button[kind="secondary"]:hover { background: rgba(56, 189, 248, 0.2) !important; transform: translateY(-1px); }
 
-    /* Botão CTA Principal */
     div[data-testid="stButton"] button[kind="primary"] {
         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         color: #ffffff !important; font-weight: 800; font-size: 1rem;
@@ -184,16 +217,13 @@ st.markdown("""
         background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     }
 
-    /* Trust Badge LGPD */
     .lgpd-badge {
         display: flex; align-items: center; justify-content: center; gap: 8px;
         margin-top: 15px; color: #64748b; font-size: 0.75rem; font-weight: 500;
     }
     .lgpd-badge svg { fill: #64748b; width: 14px; height: 14px; }
 
-    div[data-testid="stExpander"] {
-        background: #1a2e42; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; margin-top: 40px;
-    }
+    div[data-testid="stExpander"] { background: #1a2e42; border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 12px; margin-top: 40px; }
     div[data-testid="stExpander"] summary p { color: #38bdf8 !important; font-weight: 700; letter-spacing: 0.05em; }
 </style>
 """, unsafe_allow_html=True)
@@ -380,7 +410,7 @@ if not st.session_state.cadastro_realizado:
             st.button("Finalizar Cadastro Seguro", on_click=processar_envio_pj, type="primary")
 
     # =====================================================================
-    # FLUXO: PESSOA FÍSICA (PF) COM CÂMERA (KYC)
+    # FLUXO: PESSOA FÍSICA (PF) COM CÂMERA (KYC) PREMIUM
     # =====================================================================
     elif perfil_cliente == "👤 Pessoa Física (CPF)":
         
@@ -404,8 +434,8 @@ if not st.session_state.cadastro_realizado:
             st.markdown("<h3>3. Validação de Segurança (KYC)</h3>", unsafe_allow_html=True)
             st.markdown("<p style='color:#94a3b8; font-size: 0.85rem; margin-top: -10px;'>Para agilizar seu atendimento, envie uma foto do seu documento de identificação (RG ou CNH). É rápido e seguro.</p>", unsafe_allow_html=True)
             
-            # O COMPONENTE MÁGICO DA CÂMERA
-            foto_documento = st.camera_input("📸 Toque para abrir a câmera", key="in_camera")
+            # Câmera com CSS NASA injetado
+            foto_documento = st.camera_input("📸 Câmera de Validação", key="in_camera", label_visibility="hidden")
 
             st.markdown("<h3>4. Qual a sua necessidade?</h3>", unsafe_allow_html=True)
 
