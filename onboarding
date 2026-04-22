@@ -1,0 +1,124 @@
+import streamlit as st
+import time
+
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  CONFIGURAÇÃO E UX/UI GLOBAL                                          ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
+st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
+
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * { font-family: 'Inter', sans-serif !important; }
+
+    /* Fundo corporativo escuro, passando credibilidade */
+    .stApp {
+        background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    }
+
+    /* Card do Formulário */
+    div[data-testid="stForm"] {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+        color: #f8fafc;
+        text-align: center;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .subtitle {
+        color: #94a3b8;
+        text-align: center;
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Inputs e Selects */
+    .stTextInput label, .stSelectbox label, .stNumberInput label {
+        color: #cbd5e1 !important;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    div[data-baseweb="input"] > div, div[data-baseweb="select"] > div {
+        background-color: #0f172a !important;
+        border: 1px solid #334155 !important;
+        border-radius: 8px !important;
+        color: white !important;
+    }
+    
+    div[data-baseweb="input"] > div:focus-within, div[data-baseweb="select"] > div:focus-within {
+        border-color: #38bdf8 !important; /* Azul BSB */
+        box-shadow: 0 0 0 1px #38bdf8 !important;
+    }
+
+    /* Botão de Envio */
+    div[data-testid="stFormSubmitButton"] button {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 2rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    div[data-testid="stFormSubmitButton"] button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  INTERFACE DO FORMULÁRIO                                              ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
+st.markdown("<h1>BSB Contabilidade</h1>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Portal de Credenciamento e BPO Financeiro</div>", unsafe_allow_html=True)
+
+with st.form("onboarding_form", clear_on_submit=True):
+    st.markdown("<h3 style='color: #38bdf8; font-size: 1.1rem; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 20px;'>1. Dados da Empresa</h3>", unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        cnpj = st.text_input("CNPJ", placeholder="00.000.000/0000-00")
+    with col2:
+        razao_social = st.text_input("Razão Social", placeholder="Sua Empresa LTDA")
+        
+    col3, col4 = st.columns(2)
+    with col3:
+        regime = st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real", "MEI", "Não sei informar"])
+    with col4:
+        faturamento = st.selectbox("Faturamento Médio Mensal", ["Selecione...", "Até R$ 10.000", "R$ 10.001 a R$ 50.000", "R$ 50.001 a R$ 200.000", "Acima de R$ 200.000"])
+
+    st.markdown("<h3 style='color: #38bdf8; font-size: 1.1rem; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-top: 30px; margin-bottom: 20px;'>2. Operação Financeira</h3>", unsafe_allow_html=True)
+    
+    col5, col6 = st.columns(2)
+    with col5:
+        erp_atual = st.selectbox("Sistema de Gestão Atual (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"])
+    with col6:
+        volume_notas = st.number_input("Volume médio de NFs emitidas/mês", min_value=0, step=10)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    submit = st.form_submit_button("Finalizar Credenciamento")
+
+# ╔═══════════════════════════════════════════════════════════════════════╗
+# ║  LÓGICA DE PROCESSAMENTO (MOCK)                                       ║
+# ╚═══════════════════════════════════════════════════════════════════════╝
+if submit:
+    if cnpj == "" or razao_social == "" or regime == "Selecione...":
+        st.error("⚠️ Por favor, preencha os campos obrigatórios (CNPJ, Razão Social e Regime).")
+    else:
+        with st.spinner("Processando credenciamento e estruturando banco de dados..."):
+            time.sleep(2.5) # Simulando o tempo de processamento da API e Banco de Dados
+            st.success(f"✅ Cadastro de {razao_social} recebido com sucesso! Nossa equipe entrará em contato em breve.")
+            st.balloons()
