@@ -15,12 +15,13 @@ st.markdown("""
 
     .stApp { background-color: #f8fafc; }
 
-    div[data-testid="stForm"] {
+    /* Estilizando o container principal para parecer um card */
+    div[data-testid="stVerticalBlock"] > div:first-child {
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     h1 {
@@ -48,7 +49,8 @@ st.markdown("""
         margin-bottom: 1rem;
     }
 
-    div[data-testid="stFormSubmitButton"] button {
+    /* Botão Padrão */
+    div[data-testid="stButton"] button {
         background-color: #0284c7;
         color: white;
         font-weight: 600;
@@ -57,9 +59,10 @@ st.markdown("""
         padding: 0.75rem 2rem;
         width: 100%;
         transition: all 0.2s ease;
+        margin-top: 15px;
     }
     
-    div[data-testid="stFormSubmitButton"] button:hover {
+    div[data-testid="stButton"] button:hover {
         background-color: #0369a1;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
@@ -79,43 +82,39 @@ if 'cadastro_realizado' not in st.session_state:
 if 'dados_cliente' not in st.session_state:
     st.session_state.dados_cliente = {}
 
-# A MÁGICA ACONTECE AQUI: Container reservado para estabilizar o DOM
-main_container = st.empty()
-
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  INTERFACE DO FORMULÁRIO (VISÃO DO CLIENTE FINAL)                     ║
+# ║  INTERFACE DO FORMULÁRIO (SEM st.form PARA EVITAR BUG DO REACT)       ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 if not st.session_state.cadastro_realizado:
-    with main_container.container():
-        with st.form("onboarding_form", clear_on_submit=False):
-            st.markdown("<h3>1. Dados da Empresa</h3>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("<h3>1. Dados da Empresa</h3>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([1, 2])
+        with col1:
+            cnpj = st.text_input("CNPJ *", placeholder="00.000.000/0000-00", key="input_cnpj")
+        with col2:
+            razao_social = st.text_input("Razão Social *", placeholder="Sua Empresa LTDA", key="input_razao")
             
-            col1, col2 = st.columns([1, 2])
-            with col1:
-                cnpj = st.text_input("CNPJ *", placeholder="00.000.000/0000-00")
-            with col2:
-                razao_social = st.text_input("Razão Social *", placeholder="Sua Empresa LTDA")
-                
-            col3, col4 = st.columns(2)
-            with col3:
-                telefone = st.text_input("WhatsApp do Gestor", placeholder="(00) 00000-0000")
-            with col4:
-                email = st.text_input("E-mail Financeiro", placeholder="financeiro@empresa.com")
+        col3, col4 = st.columns(2)
+        with col3:
+            telefone = st.text_input("WhatsApp do Gestor", placeholder="(00) 00000-0000")
+        with col4:
+            email = st.text_input("E-mail Financeiro", placeholder="financeiro@empresa.com")
 
-            st.markdown("<h3>2. Perfil Operacional</h3>", unsafe_allow_html=True)
-            
-            col5, col6 = st.columns(2)
-            with col5:
-                regime = st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real"])
-                erp_atual = st.selectbox("Sistema de Gestão Atual (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"])
-            with col6:
-                faturamento = st.selectbox("Faturamento Médio Mensal", ["Selecione...", "Até R$ 20.000", "R$ 20.001 a R$ 100.000", "R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"])
-                volume_notas = st.number_input("Volume médio de NFs emitidas/mês", min_value=0, step=10)
+        st.markdown("<h3>2. Perfil Operacional</h3>", unsafe_allow_html=True)
+        
+        col5, col6 = st.columns(2)
+        with col5:
+            regime = st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real"], key="input_regime")
+            erp_atual = st.selectbox("Sistema de Gestão Atual (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"], key="input_erp")
+        with col6:
+            faturamento = st.selectbox("Faturamento Médio Mensal", ["Selecione...", "Até R$ 20.000", "R$ 20.001 a R$ 100.000", "R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"], key="input_fat")
+            volume_notas = st.number_input("Volume médio de NFs emitidas/mês", min_value=0, step=10)
 
-            st.markdown("<br>", unsafe_allow_html=True)
-            submit = st.form_submit_button("Finalizar Credenciamento")
+        # Botão normal, sem estar atrelado a um form
+        submit = st.button("Finalizar Credenciamento")
 
-        # Processamento blindado dentro do container
+        # Validação e Processamento
         if submit:
             if not cnpj or not razao_social or regime == "Selecione..." or faturamento == "Selecione...":
                 st.error("⚠️ Por favor, preencha os campos obrigatórios (CNPJ, Razão Social, Regime e Faturamento).")
@@ -136,43 +135,5 @@ if not st.session_state.cadastro_realizado:
 # ║  TELA DE SUCESSO E VISÃO INTERNA DO ESCRITÓRIO                        ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 else:
-    with main_container.container():
-        st.success(f"✅ Credenciamento finalizado com sucesso! Nossa equipe analisará seus dados e entrará em contato.")
-        st.info("A BSB Contabilidade agradece a confiança. Um consultor enviará os próximos passos no seu WhatsApp.")
-        st.balloons()
-        
-        if st.button("⬅️ Novo Cadastro (Simulação)"):
-            st.session_state.cadastro_realizado = False
-            st.session_state.dados_cliente = {}
-            st.rerun()
-
-        st.markdown("<br><br><br>", unsafe_allow_html=True)
-        
-        with st.expander("🔒 VISÃO INTERNA BSB (Mostrar na Reunião)"):
-            st.markdown("Isso é o que o escritório recebe após o cliente clicar em enviar:")
-            dados = st.session_state.dados_cliente
-            
-            risco = "Baixo"
-            cor_risco = "green"
-            recomendacao = "Fluxo padrão de Onboarding. Integração via API do ERP."
-            
-            if dados['erp'] == "Nenhum / Excel" and dados['faturamento'] in ["R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"]:
-                risco = "CRÍTICO"
-                cor_risco = "red"
-                recomendacao = "Atenção: Alto volume financeiro sem sistema de gestão. Necessário cobrar taxa extra de setup para organização de passivo."
-            elif dados['erp'] == "Nenhum / Excel":
-                risco = "Médio"
-                cor_risco = "orange"
-                recomendacao = "Cliente desestruturado. Necessário implantar Conta Azul ou Omie antes de iniciar o BPO."
-
-            st.markdown(f"""
-            **Novo Lead Capturado:** {dados['razao']} ({dados['cnpj']})  
-            **Data:** {dados['data']}  
-            **Faturamento Declarado:** {dados['faturamento']}  
-            **Sistema Atual:** {dados['erp']}  
-            
-            ---
-            ### 🤖 Inteligência de Dados
-            Score Operacional: <strong style='color: {cor_risco}'>{risco}</strong>  
-            Ação Recomendada pelo Sistema: {recomendacao}
-            """, unsafe_allow_html=True)
+    st.success(f"✅ Credenciamento finalizado com sucesso! Nossa equipe analisará seus dados e entrará em contato.")
+    st.info("A BSB Contabilidade agradece a confiança. Um consultor enviará
