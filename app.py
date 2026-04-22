@@ -7,7 +7,7 @@ from datetime import datetime
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
-# CSS customizado com animação de carrossel, Glassmorphism e Tipografia Premium
+# CSS customizado com correções de Padding e Alinhamento Vertical
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -24,7 +24,7 @@ st.markdown("""
     header[data-testid="stHeader"] { background: transparent; height: 0; }
 
     .block-container {
-        max-width: 520px !important; /* Levemente mais largo para dar respiro aos inputs */
+        max-width: 520px !important; 
         padding: 3rem 1rem 1rem 1rem !important;
     }
 
@@ -141,12 +141,12 @@ st.markdown("""
        UI NASA: FORMULÁRIO, INPUTS E TIPOGRAFIA
        ═══════════════════════════════════════════════════════════════ */
     
-    /* Títulos de Sessão em formato de Badge Premium */
+    /* CORREÇÃO 1: Títulos de Sessão mais afastados da borda esquerda */
     h3 {
         display: inline-block;
         background: rgba(56, 189, 248, 0.1);
         color: #38bdf8 !important;
-        padding: 8px 16px;
+        padding: 10px 20px 10px 24px !important; /* 24px de respiro à esquerda */
         border-radius: 8px;
         font-size: 0.85rem !important;
         font-weight: 800 !important;
@@ -158,24 +158,22 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(56, 189, 248, 0.05);
     }
 
-    /* Ajuste de espaçamento global das colunas */
     div[data-testid="column"] {
         padding: 0 8px;
     }
 
-    /* Estilização dos Inputs com Efeito Glass (Vidro translúcido) */
+    /* CORREÇÃO 2: Inputs com altura mínima para evitar corte de texto */
     div[data-baseweb="select"] > div,
     div[data-baseweb="input"] > div {
-        background: rgba(11, 30, 46, 0.6) !important; /* Fundo transparente chique */
+        background: rgba(11, 30, 46, 0.6) !important; 
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(148, 163, 184, 0.2) !important; /* Borda sutil */
-        border-radius: 12px !important; /* Mais arredondado */
-        padding: 4px 8px; /* Respiro interno */
+        border: 1px solid rgba(148, 163, 184, 0.2) !important; 
+        border-radius: 12px !important; 
+        min-height: 48px !important; /* Força uma altura maior e padronizada */
         color: #f1f5f9 !important;
         transition: all 0.3s ease;
     }
     
-    /* Efeito de foco (quando o usuário clica) */
     div[data-baseweb="select"] > div:hover, div[data-baseweb="select"] > div:focus-within,
     div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within {
         background: rgba(11, 30, 46, 0.9) !important;
@@ -186,7 +184,6 @@ st.markdown("""
     
     input, select, div[data-baseweb="select"] span { color: #f1f5f9 !important; font-size: 0.95rem !important;}
     
-    /* Cor e Tipografia NASA para os Labels */
     .stSelectbox label, .stTextInput label, .stNumberInput label {
         color: #94a3b8 !important;
         font-size: 0.72rem !important;
@@ -197,7 +194,7 @@ st.markdown("""
         padding-left: 2px;
     }
 
-    /* Botão CTA Alienígena */
+    /* Botão CTA */
     div[data-testid="stButton"] button {
         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         color: #ffffff !important;
@@ -324,7 +321,6 @@ if not st.session_state.cadastro_realizado:
     
     st.markdown("<h3>1. Dados da Empresa</h3>", unsafe_allow_html=True)
     
-    # Adicionando um gap maior (respiro) nas colunas via layout
     col1, col2 = st.columns([1, 1], gap="medium")
     with col1:
         st.text_input("CNPJ *", placeholder="00.000.000/0000-00", key="in_cnpj")
