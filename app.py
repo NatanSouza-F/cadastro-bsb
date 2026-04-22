@@ -7,7 +7,7 @@ from datetime import datetime
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
-# CSS customizado para a paleta Azul BSB com animações de 5 elementos
+# CSS customizado com animação de carrossel contínua e pausa no hover
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -49,26 +49,28 @@ st.markdown("""
         font-size: 1rem;
         font-weight: 500;
         margin-top: 8px;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       CARROSSEL 3D ANIMADO — Ajustado para 5 cards (25 segundos)
+       CARROSSEL 3D ANIMADO — Deslizamento Suave & Pausa no Hover/Touch
        ═══════════════════════════════════════════════════════════════ */
     .carousel-wrapper {
         position: relative;
         width: 100%;
         height: 180px;
-        margin: 16px 0 24px 0;
+        margin: 10px 0 30px 0;
         perspective: 1200px;
         overflow: hidden;
     }
+    
     .carousel-track {
         position: relative;
         width: 100%;
         height: 100%;
         transform-style: preserve-3d;
     }
+
     .carousel-card {
         position: absolute;
         top: 0;
@@ -85,8 +87,10 @@ st.markdown("""
         flex-direction: column;
         justify-content: space-between;
         opacity: 0;
-        animation: carousel-rotate 25s infinite ease-in-out; /* 5 cards = 25s */
+        cursor: pointer; /* Mostra que é interativo */
+        animation: carousel-slide 25s infinite ease-in-out; 
     }
+
     .carousel-card::before {
         content: "";
         position: absolute;
@@ -96,22 +100,28 @@ st.markdown("""
         opacity: 0.8;
     }
     
-    /* Delays ajustados para 5 elementos (5 segundos cada) */
+    /* Regra MÁGICA: Pausa a animação ao passar o mouse ou tocar no celular */
+    .carousel-wrapper:hover .carousel-card,
+    .carousel-wrapper:active .carousel-card {
+        animation-play-state: paused !important;
+    }
+    
     .carousel-card:nth-child(1) { animation-delay: 0s; }
     .carousel-card:nth-child(2) { animation-delay: 5s; }
     .carousel-card:nth-child(3) { animation-delay: 10s; }
     .carousel-card:nth-child(4) { animation-delay: 15s; }
     .carousel-card:nth-child(5) { animation-delay: 20s; }
 
-    /* Tempos de animação baseados em blocos de 20% (1/5 do tempo total) */
-    @keyframes carousel-rotate {
-        0%, 100% { opacity: 0; transform: translateX(0) rotateY(90deg) scale(0.8); }
-        4% { opacity: 1; transform: translateX(0) rotateY(0deg) scale(1); }
-        16% { opacity: 1; transform: translateX(0) rotateY(0deg) scale(1); }
-        20% { opacity: 0; transform: translateX(-100%) rotateY(-90deg) scale(0.8); }
+    /* Nova animação: Desliza da direita para a esquerda de forma elegante */
+    @keyframes carousel-slide {
+        0% { opacity: 0; transform: translateX(100px) scale(0.9); }
+        4% { opacity: 1; transform: translateX(0) scale(1); }
+        16% { opacity: 1; transform: translateX(0) scale(1); }
+        20% { opacity: 0; transform: translateX(-100px) scale(0.9); }
+        100% { opacity: 0; transform: translateX(-100px) scale(0.9); }
     }
 
-    .carousel-icon { font-size: 1.8rem; line-height: 1; }
+    .carousel-icon { font-size: 1.8rem; line-height: 1; margin-bottom: 2px;}
     .carousel-label {
         font-size: 0.72rem;
         font-weight: 700;
@@ -126,30 +136,12 @@ st.markdown("""
         font-weight: 400;
         margin: 4px 0;
         text-shadow: none;
+        line-height: 1.3;
     }
 
     /* ═══════════════════════════════════════════════════════════════
        RESTANTE DOS ESTILOS (FORMULÁRIO, BOTÕES, ETC)
        ═══════════════════════════════════════════════════════════════ */
-    .main-card {
-        background: linear-gradient(135deg, #1a2e42 0%, #243b54 100%);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 20px;
-        padding: 2.5rem;
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(56, 189, 248, 0.05);
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-    .main-card::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #38bdf8, transparent);
-        opacity: 0.8;
-    }
-
     h3 {
         color: #38bdf8 !important;
         font-size: 1.1rem !important;
@@ -164,7 +156,7 @@ st.markdown("""
 
     div[data-baseweb="select"] > div,
     div[data-baseweb="input"] > div {
-        background: #0b1e2e !important;
+        background: #1a2e42 !important;
         border: 1px solid #334155 !important;
         border-radius: 10px !important;
         color: #f1f5f9 !important;
@@ -206,6 +198,7 @@ st.markdown("""
         background: #1a2e42;
         border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 12px;
+        margin-top: 30px;
     }
     div[data-testid="stExpander"] summary p {
         color: #38bdf8 !important;
@@ -257,36 +250,52 @@ st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=Tru
 st.markdown('<p class="bsb-slogan">Bem-vindo! Para darmos continuidade, precisamos realizar o seu cadastro financeiro.</p>', unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  CARROSSEL DE SERVIÇOS 3D (Bloco HTML puro injetado via Python)       ║
+# ║  CARROSSEL DE SERVIÇOS 3D (Com Pausa)                                 ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
+SERVICES = [
+    {
+        "icon": "🏢",
+        "label": "SOCIETÁRIO",
+        "description": "Todo negócio precisa estar juridicamente em dia para garantir segurança e conformidade."
+    },
+    {
+        "icon": "💰",
+        "label": "RECUPERAÇÃO DE CRÉDITOS",
+        "description": "Você sabia que sua empresa pode ter valores pagos indevidamente a serem recuperados?"
+    },
+    {
+        "icon": "🧾",
+        "label": "DEPARTAMENTO FISCAL",
+        "description": "O cenário tributário brasileiro é desafiador, mas ajudamos na correta apuração e entrega."
+    },
+    {
+        "icon": "👥",
+        "label": "DEPARTAMENTO PESSOAL",
+        "description": "Gerenciar pessoas exige atenção constante à legislação trabalhista e previdenciária."
+    },
+    {
+        "icon": "📊",
+        "label": "CONTABILIDADE",
+        "description": "Na BSB Contabilidade, tratamos a contabilidade como uma ferramenta de gestão."
+    }
+]
+
 carousel_html = """
 <div class="carousel-wrapper">
     <div class="carousel-track">
+"""
+for service in SERVICES:
+    carousel_html += f"""
         <div class="carousel-card">
-            <div class="carousel-icon">🏢</div>
-            <div class="carousel-label">SOCIETÁRIO</div>
-            <div class="carousel-description">Todo negócio precisa estar juridicamente em dia para garantir segurança e conformidade operacional.</div>
+            <div class="carousel-icon">{service['icon']}</div>
+            <div class="carousel-label">{service['label']}</div>
+            <div class="carousel-description">{service['description']}</div>
         </div>
-        <div class="carousel-card">
-            <div class="carousel-icon">💰</div>
-            <div class="carousel-label">RECUPERAÇÃO DE CRÉDITOS</div>
-            <div class="carousel-description">Você sabia que sua empresa pode ter valores pagos indevidamente a serem recuperados?</div>
-        </div>
-        <div class="carousel-card">
-            <div class="carousel-icon">🧾</div>
-            <div class="carousel-label">DEPARTAMENTO FISCAL</div>
-            <div class="carousel-description">O cenário tributário brasileiro é desafiador, mas ajudamos na correta apuração e entrega.</div>
-        </div>
-        <div class="carousel-card">
-            <div class="carousel-icon">👥</div>
-            <div class="carousel-label">DEPARTAMENTO PESSOAL</div>
-            <div class="carousel-description">Gerenciar pessoas exige atenção constante à legislação trabalhista e previdenciária.</div>
-        </div>
-        <div class="carousel-card">
-            <div class="carousel-icon">📊</div>
-            <div class="carousel-label">CONTABILIDADE</div>
-            <div class="carousel-description">Na BSB Contabilidade, tratamos a contabilidade como uma ferramenta de gestão.</div>
-        </div>
+    """
+carousel_html += """
+    </div>
+    <div style="text-align: center; color: #64748b; font-size: 0.65rem; margin-top: 155px; opacity: 0.7;">
+        👉 Pressione ou passe o mouse no card para pausar a leitura
     </div>
 </div>
 """
@@ -295,10 +304,8 @@ if not st.session_state.cadastro_realizado:
     st.markdown(carousel_html, unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  INTERFACE DO FORMULÁRIO                                              ║
+# ║  INTERFACE DO FORMULÁRIO (Agora fluindo no fundo da página)           ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
-st.markdown('<div class="main-card">', unsafe_allow_html=True)
-
 if not st.session_state.cadastro_realizado:
     st.markdown("<h3>1. Dados da Empresa</h3>", unsafe_allow_html=True)
     
@@ -338,8 +345,6 @@ else:
     st.balloons()
     
     st.button("⬅️ Novo Cadastro (Modo Demo)", on_click=resetar_tela)
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
 # ║  EASTER EGG: VISÃO INTERNA PARA A SUA REUNIÃO                         ║
