@@ -130,74 +130,57 @@ st.markdown("""
 
     /* Estilização do Radio Button (Seletor de Perfil) */
     div.stRadio > div[role="radiogroup"] {
-        background: rgba(11, 30, 46, 0.6);
-        padding: 5px;
-        border-radius: 12px;
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        display: flex;
-        gap: 10px;
+        background: rgba(11, 30, 46, 0.6); padding: 5px; border-radius: 12px;
+        border: 1px solid rgba(56, 189, 248, 0.3); display: flex; gap: 10px;
     }
     div.stRadio > div[role="radiogroup"] label {
-        background: transparent !important;
-        padding: 10px 20px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+        background: transparent !important; padding: 10px 20px; border-radius: 8px; transition: all 0.3s ease;
     }
 
     /* Inputs Glassmorphism Alto Contraste */
     div[data-baseweb="select"] > div, div[data-baseweb="input"] > div, div[data-baseweb="number-input"] > div {
-        background: rgba(11, 30, 46, 0.6) !important; 
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(148, 163, 184, 0.3) !important; 
-        border-radius: 10px !important; 
-        transition: all 0.3s ease;
+        background: rgba(11, 30, 46, 0.6) !important; backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.3) !important; border-radius: 10px !important; transition: all 0.3s ease;
     }
     div[data-baseweb="select"] > div:hover, div[data-baseweb="select"] > div:focus-within,
     div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within,
     div[data-baseweb="number-input"] > div:hover, div[data-baseweb="number-input"] > div:focus-within {
-        background: rgba(11, 30, 46, 0.9) !important;
-        border-color: rgba(56, 189, 248, 0.8) !important;
+        background: rgba(11, 30, 46, 0.9) !important; border-color: rgba(56, 189, 248, 0.8) !important;
         box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
     }
     
-    input, select, div[data-baseweb="select"] span { 
-        color: #e2e8f0 !important; 
-        font-size: 0.9rem !important; 
-        font-weight: 500 !important;
-    }
-    
-    .stSelectbox label, .stTextInput label, .stNumberInput label, .stRadio label {
+    input, select, div[data-baseweb="select"] span { color: #e2e8f0 !important; font-size: 0.9rem !important; font-weight: 500 !important; }
+    .stSelectbox label, .stTextInput label, .stNumberInput label, .stRadio label, .stCameraInput label {
         color: #94a3b8 !important; font-size: 0.72rem !important; font-weight: 700 !important;
         text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px !important; padding-left: 2px;
     }
 
+    /* Estilização Câmera (Streamlit native camera widget) */
+    div[data-testid="stCameraInput"] {
+        background: rgba(11, 30, 46, 0.4);
+        border: 1px dashed rgba(56, 189, 248, 0.5);
+        border-radius: 12px;
+        padding: 10px;
+    }
+
     /* Botão Secundário (API Buscar) */
     button[kind="secondary"] {
-        background: rgba(56, 189, 248, 0.1) !important;
-        border: 1px solid rgba(56, 189, 248, 0.4) !important;
-        color: #38bdf8 !important;
-        border-radius: 10px !important;
-        margin-top: 28px !important;
-        height: 42px !important;
-        transition: all 0.2s ease !important;
+        background: rgba(56, 189, 248, 0.1) !important; border: 1px solid rgba(56, 189, 248, 0.4) !important;
+        color: #38bdf8 !important; border-radius: 10px !important; margin-top: 28px !important;
+        height: 42px !important; transition: all 0.2s ease !important;
     }
-    button[kind="secondary"]:hover {
-        background: rgba(56, 189, 248, 0.2) !important;
-        transform: translateY(-1px);
-    }
+    button[kind="secondary"]:hover { background: rgba(56, 189, 248, 0.2) !important; transform: translateY(-1px); }
 
     /* Botão CTA Principal */
     div[data-testid="stButton"] button[kind="primary"] {
         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         color: #ffffff !important; font-weight: 800; font-size: 1rem;
         border: none; border-radius: 12px; padding: 0.9rem 2rem; width: 100%;
-        box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         margin-top: 20px; text-transform: uppercase; letter-spacing: 0.1em;
     }
     div[data-testid="stButton"] button[kind="primary"]:hover {
-        transform: translateY(-3px) scale(1.01);
-        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.5);
+        transform: translateY(-3px) scale(1.01); box-shadow: 0 10px 30px rgba(14, 165, 233, 0.5);
         background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     }
 
@@ -234,7 +217,6 @@ if 'erro_validacao' not in st.session_state:
 def buscar_cnpj_api():
     cnpj_raw = st.session_state.in_cnpj
     cnpj_limpo = re.sub(r'\D', '', cnpj_raw)
-    
     if len(cnpj_limpo) == 14:
         try:
             response = requests.get(f"https://brasilapi.com.br/api/cnpj/v1/{cnpj_limpo}", timeout=5)
@@ -247,13 +229,11 @@ def buscar_cnpj_api():
                 st.session_state.razao_social_api = ""
                 st.session_state.nome_fantasia_api = ""
         except:
-            st.session_state.razao_social_api = ""
-            st.session_state.nome_fantasia_api = ""
-    
-    st.session_state.etapa = 2 # Libera a segunda etapa (Apenas PJ)
+            pass
+    st.session_state.etapa = 2 
 
 def avancar_pf():
-    st.session_state.etapa = 2 # Libera a segunda etapa (Para PF)
+    st.session_state.etapa = 2 
 
 def processar_envio_pj():
     razao = st.session_state.in_razao
@@ -279,7 +259,7 @@ def processar_envio_pj():
         }
         st.session_state.cadastro_realizado = True
 
-def processar_envio_pf():
+def processar_envio_pf(foto_tirada):
     cpf = st.session_state.in_cpf
     nome = st.session_state.in_nome_pf
     necessidade = st.session_state.in_necessidade
@@ -297,6 +277,7 @@ def processar_envio_pf():
             "profissao": st.session_state.in_prof,
             "renda_media": st.session_state.in_renda_pf,
             "necessidade_principal": necessidade,
+            "documento_identificacao": "✅ Foto Capturada (Seguro)" if foto_tirada else "❌ Não anexado",
             "data_cadastro": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         }
         st.session_state.cadastro_realizado = True
@@ -346,7 +327,6 @@ if not st.session_state.cadastro_realizado:
     
     st.markdown("<h3>1. Qual é o seu perfil?</h3>", unsafe_allow_html=True)
     
-    # Seletor de Perfil do Cliente
     perfil_cliente = st.radio(
         "Selecione o tipo de cadastro:",
         ["🏢 Empresa (CNPJ)", "👤 Pessoa Física (CPF)"],
@@ -386,7 +366,7 @@ if not st.session_state.cadastro_realizado:
             with col_reg:
                 st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real", "Não sei / MEI"], key="in_regime")
             with col_func:
-                st.selectbox("Quantidade de Funcionários (Folha/DP)", ["Nenhum (Sócios)", "1 a 5 funcionários", "6 a 20 funcionários", "Mais de 20 funcionários"], key="in_func")
+                st.selectbox("Quantidade de Funcionários (Folha)", ["Nenhum (Sócios)", "1 a 5 funcionários", "6 a 20 funcionários", "Mais de 20 funcionários"], key="in_func")
 
             col5, col6 = st.columns([1, 1], gap="medium")
             with col5:
@@ -400,7 +380,7 @@ if not st.session_state.cadastro_realizado:
             st.button("Finalizar Cadastro Seguro", on_click=processar_envio_pj, type="primary")
 
     # =====================================================================
-    # FLUXO: PESSOA FÍSICA (PF)
+    # FLUXO: PESSOA FÍSICA (PF) COM CÂMERA (KYC)
     # =====================================================================
     elif perfil_cliente == "👤 Pessoa Física (CPF)":
         
@@ -421,7 +401,13 @@ if not st.session_state.cadastro_realizado:
             with col_c2:
                 st.text_input("E-mail Pessoal", placeholder="seuemail@gmail.com", key="in_email_pf")
 
-            st.markdown("<h3>3. Qual a sua necessidade?</h3>", unsafe_allow_html=True)
+            st.markdown("<h3>3. Validação de Segurança (KYC)</h3>", unsafe_allow_html=True)
+            st.markdown("<p style='color:#94a3b8; font-size: 0.85rem; margin-top: -10px;'>Para agilizar seu atendimento, envie uma foto do seu documento de identificação (RG ou CNH). É rápido e seguro.</p>", unsafe_allow_html=True)
+            
+            # O COMPONENTE MÁGICO DA CÂMERA
+            foto_documento = st.camera_input("📸 Toque para abrir a câmera", key="in_camera")
+
+            st.markdown("<h3>4. Qual a sua necessidade?</h3>", unsafe_allow_html=True)
 
             col_p1, col_p2 = st.columns([1, 1], gap="medium")
             with col_p1:
@@ -440,9 +426,9 @@ if not st.session_state.cadastro_realizado:
             if st.session_state.erro_validacao:
                 st.markdown('<div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; margin-top: 10px;">⚠️ Por favor, preencha todos os campos obrigatórios (*).</div>', unsafe_allow_html=True)
 
-            st.button("Finalizar Cadastro Seguro", on_click=processar_envio_pf, type="primary")
+            st.button("Finalizar Cadastro Seguro", on_click=processar_envio_pf, args=(foto_documento,), type="primary")
 
-    # Selo Trust & Compliance (LGPD) - Comum a ambos
+    # Selo Trust & Compliance (LGPD)
     if st.session_state.etapa == 2:
         st.markdown("""
         <div class="lgpd-badge">
@@ -471,8 +457,6 @@ if st.session_state.cadastro_realizado:
         st.markdown("<p style='color: #94a3b8; font-size: 0.85rem;'>Este é o formato JSON estruturado pronto para ser enviado ao Banco de Dados Relacional (PostgreSQL/MySQL) do escritório, sem necessidade de digitação humana:</p>", unsafe_allow_html=True)
         
         dados = st.session_state.dados_cliente
-        
-        # Exibe os dados de forma limpa como se fosse um JSON para o cliente entender a "mágica"
         st.json(dados)
         
         st.markdown("<hr style='border-color: #334155;'>", unsafe_allow_html=True)
@@ -481,7 +465,7 @@ if st.session_state.cadastro_realizado:
         if dados['tipo_cliente'] == "Pessoa Jurídica (PJ)":
             st.markdown(f"<p style='color: #f1f5f9; font-size: 0.9rem;'>Lead PJ capturado. Alerta enviado ao setor <strong>Societário / Fiscal</strong>.</p>", unsafe_allow_html=True)
         else:
-            if "abrir uma Empresa" in dados['necessidade_principal']:
+            if "abrir uma Empresa" in dados.get('necessidade_principal', ''):
                 st.markdown(f"<p style='color: #10b981; font-size: 0.9rem;'><strong>ALERTA DE VENDA:</strong> Cliente deseja transformar CPF em CNPJ. Notificar o time Societário/Comercial imediatamente.</p>", unsafe_allow_html=True)
             else:
                 st.markdown(f"<p style='color: #f1f5f9; font-size: 0.9rem;'>Lead PF capturado. Alerta enviado ao setor de <strong>Imposto de Renda / Assessoria Pessoal</strong>.</p>", unsafe_allow_html=True)
