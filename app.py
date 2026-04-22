@@ -7,7 +7,7 @@ from datetime import datetime
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
-# CSS customizado com animação de carrossel contínua e pausa no hover
+# CSS customizado com animação de carrossel, Glassmorphism e Tipografia Premium
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -24,7 +24,7 @@ st.markdown("""
     header[data-testid="stHeader"] { background: transparent; height: 0; }
 
     .block-container {
-        max-width: 480px !important;
+        max-width: 520px !important; /* Levemente mais largo para dar respiro aos inputs */
         padding: 3rem 1rem 1rem 1rem !important;
     }
 
@@ -32,7 +32,7 @@ st.markdown("""
 
     /* Logo BSB com gradiente Azul Premium */
     .bsb-logo {
-        font-size: 2.4rem;
+        font-size: 2.6rem;
         font-weight: 900;
         background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #2563eb 100%);
         -webkit-background-clip: text;
@@ -53,7 +53,7 @@ st.markdown("""
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       CARROSSEL 3D ANIMADO — Deslizamento Suave & Pausa no Hover/Touch
+       CARROSSEL 3D ANIMADO
        ═══════════════════════════════════════════════════════════════ */
     .carousel-wrapper {
         position: relative;
@@ -100,7 +100,6 @@ st.markdown("""
         opacity: 0.8;
     }
     
-    /* Regra MÁGICA: Pausa a animação ao passar o mouse ou tocar */
     .carousel-wrapper:hover .carousel-card,
     .carousel-wrapper:active .carousel-card {
         animation-play-state: paused !important;
@@ -112,7 +111,6 @@ st.markdown("""
     .carousel-card:nth-child(4) { animation-delay: 15s; }
     .carousel-card:nth-child(5) { animation-delay: 20s; }
 
-    /* Desliza da direita para a esquerda de forma elegante */
     @keyframes carousel-slide {
         0% { opacity: 0; transform: translateX(100px) scale(0.9); }
         4% { opacity: 1; transform: translateX(0) scale(1); }
@@ -140,69 +138,98 @@ st.markdown("""
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       RESTANTE DOS ESTILOS (FORMULÁRIO, BOTÕES, ETC)
+       UI NASA: FORMULÁRIO, INPUTS E TIPOGRAFIA
        ═══════════════════════════════════════════════════════════════ */
+    
+    /* Títulos de Sessão em formato de Badge Premium */
     h3 {
+        display: inline-block;
+        background: rgba(56, 189, 248, 0.1);
         color: #38bdf8 !important;
-        font-size: 1.1rem !important;
-        font-weight: 700 !important;
-        border-bottom: 1px solid rgba(56, 189, 248, 0.15);
-        padding-bottom: 8px;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        letter-spacing: 0.05em;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
+        border-left: 4px solid #38bdf8;
+        margin-top: 2rem !important;
+        margin-bottom: 1.5rem !important;
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.05);
     }
 
+    /* Ajuste de espaçamento global das colunas */
+    div[data-testid="column"] {
+        padding: 0 8px;
+    }
+
+    /* Estilização dos Inputs com Efeito Glass (Vidro translúcido) */
     div[data-baseweb="select"] > div,
     div[data-baseweb="input"] > div {
-        background: #1a2e42 !important;
-        border: 1px solid #334155 !important;
-        border-radius: 10px !important;
+        background: rgba(11, 30, 46, 0.6) !important; /* Fundo transparente chique */
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(148, 163, 184, 0.2) !important; /* Borda sutil */
+        border-radius: 12px !important; /* Mais arredondado */
+        padding: 4px 8px; /* Respiro interno */
         color: #f1f5f9 !important;
+        transition: all 0.3s ease;
     }
+    
+    /* Efeito de foco (quando o usuário clica) */
     div[data-baseweb="select"] > div:hover, div[data-baseweb="select"] > div:focus-within,
     div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within {
-        border-color: rgba(56, 189, 248, 0.6) !important;
-        box-shadow: 0 0 10px rgba(56, 189, 248, 0.1);
+        background: rgba(11, 30, 46, 0.9) !important;
+        border-color: rgba(56, 189, 248, 0.8) !important;
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        transform: translateY(-1px);
     }
-    input, select, div[data-baseweb="select"] span { color: #f1f5f9 !important; }
     
+    input, select, div[data-baseweb="select"] span { color: #f1f5f9 !important; font-size: 0.95rem !important;}
+    
+    /* Cor e Tipografia NASA para os Labels */
     .stSelectbox label, .stTextInput label, .stNumberInput label {
         color: #94a3b8 !important;
-        font-size: 0.8rem !important;
-        font-weight: 600 !important;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 6px !important;
+        padding-left: 2px;
     }
 
+    /* Botão CTA Alienígena */
     div[data-testid="stButton"] button {
         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         color: #ffffff !important;
         font-weight: 800;
+        font-size: 1rem;
         border: none;
         border-radius: 12px;
-        padding: 0.75rem 2rem;
+        padding: 0.9rem 2rem;
         width: 100%;
-        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25);
-        transition: all 0.3s ease;
-        margin-top: 20px;
+        box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 30px;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
     }
     div[data-testid="stButton"] button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.5);
         background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     }
 
+    /* Expander Interno */
     div[data-testid="stExpander"] {
         background: #1a2e42;
         border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 12px;
-        margin-top: 30px;
+        margin-top: 40px;
     }
     div[data-testid="stExpander"] summary p {
         color: #38bdf8 !important;
         font-weight: 700;
+        letter-spacing: 0.05em;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -250,7 +277,7 @@ st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=Tru
 st.markdown('<p class="bsb-slogan">Bem-vindo! Para darmos continuidade, precisamos realizar o seu cadastro financeiro.</p>', unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  CARROSSEL DE SERVIÇOS 3D (BLINDADO CONTRA ERRO DE INDENTAÇÃO)        ║
+# ║  CARROSSEL DE SERVIÇOS 3D                                             ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 carousel_html = """
 <div class="carousel-wrapper">
@@ -291,18 +318,20 @@ if not st.session_state.cadastro_realizado:
     st.markdown(carousel_html, unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  INTERFACE DO FORMULÁRIO                                              ║
+# ║  INTERFACE DO FORMULÁRIO (DESIGN NASA)                                ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 if not st.session_state.cadastro_realizado:
+    
     st.markdown("<h3>1. Dados da Empresa</h3>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns([1, 2])
+    # Adicionando um gap maior (respiro) nas colunas via layout
+    col1, col2 = st.columns([1, 1], gap="medium")
     with col1:
         st.text_input("CNPJ *", placeholder="00.000.000/0000-00", key="in_cnpj")
     with col2:
         st.text_input("Razão Social *", placeholder="Sua Empresa LTDA", key="in_razao")
         
-    col3, col4 = st.columns(2)
+    col3, col4 = st.columns([1, 1], gap="medium")
     with col3:
         st.text_input("WhatsApp do Gestor", placeholder="(00) 00000-0000", key="in_wpp")
     with col4:
@@ -310,16 +339,20 @@ if not st.session_state.cadastro_realizado:
 
     st.markdown("<h3>2. Perfil Operacional</h3>", unsafe_allow_html=True)
     
-    col5, col6 = st.columns(2)
+    col5, col6 = st.columns([1, 1], gap="medium")
     with col5:
         st.selectbox("Regime Tributário", ["Selecione...", "Simples Nacional", "Lucro Presumido", "Lucro Real"], key="in_regime")
-        st.selectbox("Sistema de Gestão Atual (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"], key="in_erp")
+        st.selectbox("Sistema de Gestão (ERP)", ["Nenhum / Excel", "Conta Azul", "Omie", "Nibo", "Bling", "Outro"], key="in_erp")
     with col6:
         st.selectbox("Faturamento Médio Mensal", ["Selecione...", "Até R$ 20.000", "R$ 20.001 a R$ 100.000", "R$ 100.001 a R$ 500.000", "Acima de R$ 500.000"], key="in_fat")
-        st.number_input("Volume médio de NFs emitidas/mês", min_value=0, step=10, key="in_notas")
+        st.number_input("Volume NFs emitidas/mês", min_value=0, step=10, key="in_notas")
 
     if st.session_state.erro_validacao:
-        st.error("⚠️ Por favor, preencha os campos obrigatórios (*).")
+        st.markdown("""
+        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; margin-top: 10px;">
+            ⚠️ Por favor, preencha todos os campos obrigatórios (*).
+        </div>
+        """, unsafe_allow_html=True)
 
     st.button("Finalizar Cadastro", on_click=processar_envio)
 
