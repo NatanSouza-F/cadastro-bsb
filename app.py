@@ -34,7 +34,6 @@ st.markdown("""
         font-weight: 500; line-height: 1.5; margin-top: 12px; margin-bottom: 2rem;
     }
 
-    /* Títulos de Sessão NASA */
     h3 {
         display: inline-block; background: rgba(56, 189, 248, 0.1); color: #38bdf8 !important;
         padding: 10px 20px 10px 24px !important; border-radius: 8px; font-size: 0.85rem !important; font-weight: 800 !important;
@@ -42,41 +41,32 @@ st.markdown("""
         margin-top: 1.5rem !important; margin-bottom: 1.2rem !important; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.05);
     }
 
-    /* Inputs Glassmorphism */
     div[data-baseweb="select"] > div, div[data-baseweb="input"] > div, div[data-baseweb="number-input"] > div {
         background: rgba(11, 30, 46, 0.6) !important; backdrop-filter: blur(10px);
         border: 1px solid rgba(148, 163, 184, 0.3) !important; border-radius: 10px !important; transition: all 0.3s ease;
     }
-    div[data-baseweb="input"] > div:focus-within { border-color: #38bdf8 !important; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2); }
     
     input, select { color: #e2e8f0 !important; font-size: 0.9rem !important; }
     label { color: #94a3b8 !important; font-size: 0.72rem !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: 0.08em; }
 
-    /* Botão KYC Selector */
     div.stButton > button[kind="secondary"] {
         background: rgba(11, 30, 46, 0.8) !important; border: 1px solid rgba(56, 189, 248, 0.3) !important;
         border-radius: 16px !important; color: #f1f5f9 !important; width: 100% !important; height: 70px !important;
         font-weight: 700 !important; transition: all 0.3s ease !important;
     }
-    div.stButton > button[kind="secondary"]:hover { border-color: #38bdf8 !important; transform: translateY(-2px); }
 
-    /* Botão Primary */
     div[data-testid="stButton"] button[kind="primary"] {
         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
         color: #ffffff !important; font-weight: 800; border: none; border-radius: 12px; padding: 0.8rem 2rem; width: 100%;
         box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3); text-transform: uppercase; letter-spacing: 0.1em;
     }
 
-    /* LGPD Badge */
     .lgpd-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; color: #64748b; font-size: 0.75rem; }
-    
-    /* Carousel 3D Speed */
-    .carousel-card { animation: carousel-slide 25s infinite ease-in-out; }
 </style>
 """, unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  LÓGICA DE NEGÓCIO E APIs                                             ║
+# ║  LÓGICA DE NEGÓCIO E ESTADO                                           ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 if 'etapa' not in st.session_state: st.session_state.etapa = 1
 if 'cadastro_realizado' not in st.session_state: st.session_state.cadastro_realizado = False
@@ -108,7 +98,11 @@ def buscar_cep(key_cep):
         except: pass
 
 def finalizar(perfil):
-    st.session_state.dados_cliente = {"perfil": perfil, "data": datetime.now().strftime("%d/%m/%Y %H:%M"), "endereco": st.session_state.endereco_api}
+    st.session_state.dados_cliente = {
+        "perfil": perfil, 
+        "data": datetime.now().strftime("%d/%m/%Y %H:%M"), 
+        "endereco": st.session_state.endereco_api
+    }
     st.session_state.cadastro_realizado = True
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
@@ -118,11 +112,9 @@ st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=Tru
 st.markdown('<p class="bsb-slogan">Seja bem-vindo(a)! Para darmos continuidade ao seu processo, solicitamos o preenchimento das informações a seguir:</p>', unsafe_allow_html=True)
 
 if not st.session_state.cadastro_realizado:
-    # 1. Qual o perfil?
     st.markdown("<h3>1. Perfil de Atendimento</h3>", unsafe_allow_html=True)
     perfil = st.radio("", ["🏢 Pessoa Jurídica (Empresa)", "👤 Pessoa Física (Individual)"], horizontal=True, label_visibility="collapsed")
 
-    # --- FLUXO PJ ---
     if "Jurídica" in perfil:
         col_c, col_b = st.columns([3, 1])
         with col_c: st.text_input("CNPJ da Empresa *", key="in_cnpj", placeholder="00.000.000/0000-00")
@@ -135,7 +127,7 @@ if not st.session_state.cadastro_realizado:
             with col_w: st.text_input("WhatsApp do Gestor *", key="in_wpp")
             with col_e: st.text_input("E-mail Comercial *", key="in_email")
             
-            st.markdown("<h3>3. Localização</h3>", unsafe_allow_input=True)
+            st.markdown("<h3>3. Localização</h3>", unsafe_allow_html=True)
             st.text_input("CEP Sede *", key="in_cep_pj", on_change=buscar_cep, args=("in_cep_pj",), placeholder="00000-000")
             if st.session_state.endereco_api.get("logradouro"):
                 st.info(f"📍 {st.session_state.endereco_api['logradouro']}, {st.session_state.endereco_api['bairro']} - {st.session_state.endereco_api['localidade']}/{st.session_state.endereco_api['uf']}")
@@ -143,8 +135,6 @@ if not st.session_state.cadastro_realizado:
             st.markdown("<h3>4. Operacional</h3>", unsafe_allow_html=True)
             st.selectbox("Faturamento Médio Mensal *", ["Até R$ 20k", "R$ 20k a R$ 100k", "Acima de R$ 100k"], key="in_fat")
             st.button("Finalizar Cadastro de Empresa", type="primary", on_click=finalizar, args=("PJ",))
-
-    # --- FLUXO PF ---
     else:
         col_cpf, col_n = st.columns([1, 2])
         with col_cpf: st.text_input("CPF *", key="in_cpf")
@@ -171,8 +161,5 @@ if not st.session_state.cadastro_realizado:
 else:
     st.balloons()
     st.success("✅ Cadastro Finalizado! Recebemos suas informações.")
-    st.info("Nossa equipe técnica já iniciou a triagem dos seus dados.")
-    
     with st.expander("🔒 ÁREA DO CONSULTOR (Visão de Dados)"):
         st.json(st.session_state.dados_cliente)
-        st.write("🤖 **Sugestão do Sistema:** Direcionar este lead para o setor de Onboarding Estratégico.")
