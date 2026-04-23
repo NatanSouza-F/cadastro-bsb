@@ -9,7 +9,7 @@ from datetime import datetime
 # ╚═══════════════════════════════════════════════════════════════════════╝
 st.set_page_config(page_title="BSB Contabilidade | Onboarding", page_icon="🏢", layout="centered")
 
-# CSS NASA: Glassmorphism, Micro-interações, Acessibilidade e LGPD
+# CSS NASA COMPLETO: Glassmorphism, Micro-interações e KYC
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -49,11 +49,13 @@ st.markdown("""
     input, select { color: #e2e8f0 !important; font-size: 0.9rem !important; }
     label { color: #94a3b8 !important; font-size: 0.72rem !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: 0.08em; }
 
+    /* Botão KYC Selector */
     div.stButton > button[kind="secondary"] {
         background: rgba(11, 30, 46, 0.8) !important; border: 1px solid rgba(56, 189, 248, 0.3) !important;
-        border-radius: 16px !important; color: #f1f5f9 !important; width: 100% !important; height: 70px !important;
+        border-radius: 16px !important; color: #f1f5f9 !important; width: 100% !important; height: 80px !important;
         font-weight: 700 !important; transition: all 0.3s ease !important;
     }
+    div.stButton > button[kind="secondary"]:hover { border-color: #38bdf8 !important; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(56, 189, 248, 0.1); }
 
     div[data-testid="stButton"] button[kind="primary"] {
         background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
@@ -66,14 +68,16 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
-# ║  LÓGICA DE NEGÓCIO E ESTADO                                           ║
+# ║  LÓGICA DE ESTADO E APIs                                              ║
 # ╚═══════════════════════════════════════════════════════════════════════╝
 if 'etapa' not in st.session_state: st.session_state.etapa = 1
 if 'cadastro_realizado' not in st.session_state: st.session_state.cadastro_realizado = False
 if 'dados_cliente' not in st.session_state: st.session_state.dados_cliente = {}
 if 'razao_social_api' not in st.session_state: st.session_state.razao_social_api = ""
+if 'nome_fantasia_api' not in st.session_state: st.session_state.nome_fantasia_api = ""
 if 'doc_method' not in st.session_state: st.session_state.doc_method = None
 if 'endereco_api' not in st.session_state: st.session_state.endereco_api = {"logradouro": "", "bairro": "", "localidade": "", "uf": ""}
+if 'erro_validacao' not in st.session_state: st.session_state.erro_validacao = False
 
 def buscar_cnpj():
     cnpj = re.sub(r'\D', '', st.session_state.in_cnpj)
@@ -83,7 +87,8 @@ def buscar_cnpj():
             if res.status_code == 200:
                 d = res.json()
                 st.session_state.razao_social_api = d.get("razao_social", "")
-                st.toast("✅ Empresa validada!")
+                st.session_state.nome_fantasia_api = d.get("nome_fantasia", "")
+                st.toast("✅ Empresa validada na Receita!")
         except: pass
     st.session_state.etapa = 2
 
@@ -94,16 +99,36 @@ def buscar_cep(key_cep):
             res = requests.get(f"https://viacep.com.br/ws/{cep}/json/", timeout=5)
             if res.status_code == 200:
                 st.session_state.endereco_api = res.json()
-                st.toast("📍 Endereço localizado!")
+                st.toast("📍 Endereço preenchido!")
         except: pass
 
-def finalizar(perfil):
-    st.session_state.dados_cliente = {
-        "perfil": perfil, 
-        "data": datetime.now().strftime("%d/%m/%Y %H:%M"), 
-        "endereco": st.session_state.endereco_api
-    }
-    st.session_state.cadastro_realizado = True
+def processar_envio_pj():
+    if not st.session_state.in_razao or not st.session_state.in_socio_nome:
+        st.session_state.erro_validacao = True
+    else:
+        st.session_state.dados_cliente = {
+            "tipo": "PJ",
+            "cnpj": st.session_state.in_cnpj,
+            "razao": st.session_state.in_razao,
+            "socio": st.session_state.in_socio_nome,
+            "segmento": st.session_state.in_segmento,
+            "endereco": st.session_state.endereco_api,
+            "fat": st.session_state.in_fat
+        }
+        st.session_state.cadastro_realizado = True
+
+def processar_envio_pf():
+    if not st.session_state.in_nome_pf or not st.session_state.in_cpf:
+        st.session_state.erro_validacao = True
+    else:
+        st.session_state.dados_cliente = {
+            "tipo": "PF",
+            "cpf": st.session_state.in_cpf,
+            "nome": st.session_state.in_nome_pf,
+            "investidor": st.session_state.in_investidor,
+            "endereco": st.session_state.endereco_api
+        }
+        st.session_state.cadastro_realizado = True
 
 # ╔═══════════════════════════════════════════════════════════════════════╗
 # ║  INTERFACE VISUAL                                                     ║
@@ -112,54 +137,63 @@ st.markdown('<h1 class="bsb-logo">BSB Contabilidade</h1>', unsafe_allow_html=Tru
 st.markdown('<p class="bsb-slogan">Seja bem-vindo(a)! Para darmos continuidade ao seu processo, solicitamos o preenchimento das informações a seguir:</p>', unsafe_allow_html=True)
 
 if not st.session_state.cadastro_realizado:
-    st.markdown("<h3>1. Perfil de Atendimento</h3>", unsafe_allow_html=True)
-    perfil = st.radio("", ["🏢 Pessoa Jurídica (Empresa)", "👤 Pessoa Física (Individual)"], horizontal=True, label_visibility="collapsed")
+    st.markdown("<h3>1. Qual é o seu perfil?</h3>", unsafe_allow_html=True)
+    perfil = st.radio("", ["🏢 Empresa (CNPJ)", "👤 Pessoa Física (CPF)"], horizontal=True, label_visibility="collapsed")
 
-    if "Jurídica" in perfil:
+    if "Empresa" in perfil:
         col_c, col_b = st.columns([3, 1])
         with col_c: st.text_input("CNPJ da Empresa *", key="in_cnpj", placeholder="00.000.000/0000-00")
         with col_b: st.button("🔍 Validar", on_click=buscar_cnpj, use_container_width=True)
 
         if st.session_state.etapa == 2:
             st.markdown("<h3>2. Dados da Empresa</h3>", unsafe_allow_html=True)
-            st.text_input("Razão Social *", value=st.session_state.razao_social_api, key="in_razao")
-            col_w, col_e = st.columns(2)
-            with col_w: st.text_input("WhatsApp do Gestor *", key="in_wpp")
-            with col_e: st.text_input("E-mail Comercial *", key="in_email")
+            col_r, col_f = st.columns(2)
+            with col_r: st.text_input("Razão Social *", value=st.session_state.razao_social_api, key="in_razao")
+            with col_f: st.text_input("Nome Fantasia", value=st.session_state.nome_fantasia_api, key="in_fantasia")
             
-            st.markdown("<h3>3. Localização</h3>", unsafe_allow_html=True)
+            st.selectbox("Segmento Principal", ["Serviços", "Comércio", "Indústria", "Tecnologia", "Saúde"], key="in_segmento")
+
+            st.markdown("<h3>3. Sócio Responsável</h3>", unsafe_allow_html=True)
+            st.text_input("Nome Completo do Sócio *", key="in_socio_nome")
+            
+            st.markdown("<h3>4. Localização</h3>", unsafe_allow_html=True)
             st.text_input("CEP Sede *", key="in_cep_pj", on_change=buscar_cep, args=("in_cep_pj",), placeholder="00000-000")
             if st.session_state.endereco_api.get("logradouro"):
                 st.info(f"📍 {st.session_state.endereco_api['logradouro']}, {st.session_state.endereco_api['bairro']} - {st.session_state.endereco_api['localidade']}/{st.session_state.endereco_api['uf']}")
 
-            st.markdown("<h3>4. Operacional</h3>", unsafe_allow_html=True)
+            st.markdown("<h3>5. Operacional</h3>", unsafe_allow_html=True)
             st.selectbox("Faturamento Médio Mensal *", ["Até R$ 20k", "R$ 20k a R$ 100k", "Acima de R$ 100k"], key="in_fat")
-            st.button("Finalizar Cadastro de Empresa", type="primary", on_click=finalizar, args=("PJ",))
+            st.button("Finalizar Cadastro Seguro", type="primary", on_click=processar_envio_pj)
+
     else:
         col_cpf, col_n = st.columns([1, 2])
         with col_cpf: st.text_input("CPF *", key="in_cpf")
         with col_n: st.text_input("Nome Completo *", key="in_nome_pf")
         
-        st.markdown("<h3>2. Endereço e Contato</h3>", unsafe_allow_html=True)
-        st.text_input("CEP Residencial *", key="in_cep_pf", on_change=buscar_cep, args=("in_cep_pf",))
-        col_w2, col_e2 = st.columns(2)
-        with col_w2: st.text_input("WhatsApp *", key="in_wpp_pf")
-        with col_e2: st.text_input("E-mail *", key="in_email_pf")
+        if st.session_state.etapa == 1:
+            st.button("Avançar", on_click=lambda: st.session_state.update({"etapa": 2}), use_container_width=True)
 
-        st.markdown("<h3>3. Identificação (KYC)</h3>", unsafe_allow_html=True)
-        c1, c2 = st.columns(2)
-        with c1: st.button("👤 Anexar Documento", on_click=lambda: st.session_state.update({"doc_method": "Anexar"}), type="secondary", use_container_width=True)
-        with c2: st.button("📸 Tirar Foto Agora", on_click=lambda: st.session_state.update({"doc_method": "Foto"}), type="secondary", use_container_width=True)
+        if st.session_state.etapa == 2:
+            st.markdown("<h3>2. Endereço e Contato</h3>", unsafe_allow_html=True)
+            st.text_input("CEP Residencial *", key="in_cep_pf", on_change=buscar_cep, args=("in_cep_pf",))
+            st.checkbox("📈 Opero na Bolsa de Valores / Criptomoedas", key="in_investidor")
 
-        if st.session_state.doc_method == "Anexar": st.file_uploader("Upload RG/CNH", type=['pdf','png','jpg'])
-        if st.session_state.doc_method == "Foto": st.camera_input("Capturar Documento")
+            st.markdown("<h3>3. Identificação (KYC)</h3>", unsafe_allow_html=True)
+            c1, c2 = st.columns(2)
+            with c1: st.button("👤 Anexar Documento", on_click=lambda: st.session_state.update({"doc_method": "Anexar"}), type="secondary", use_container_width=True)
+            with c2: st.button("📸 Tirar Foto Agora", on_click=lambda: st.session_state.update({"doc_method": "Foto"}), type="secondary", use_container_width=True)
 
-        st.button("Finalizar Cadastro Pessoa Física", type="primary", on_click=finalizar, args=("PF",))
+            if st.session_state.doc_method == "Anexar": st.file_uploader("Upload Frente/Verso", type=['pdf','png','jpg'])
+            if st.session_state.doc_method == "Foto": 
+                st.camera_input("Frente do Documento")
+                st.camera_input("Verso do Documento")
+
+            st.button("Finalizar Cadastro Seguro", type="primary", on_click=processar_envio_pf)
 
     st.markdown('<div class="lgpd-badge">🔒 Ambiente seguro de acordo com a LGPD</div>', unsafe_allow_html=True)
 
 else:
     st.balloons()
-    st.success("✅ Cadastro Finalizado! Recebemos suas informações.")
-    with st.expander("🔒 ÁREA DO CONSULTOR (Visão de Dados)"):
+    st.success("✅ Cadastro Finalizado com Sucesso!")
+    with st.expander("🔒 VISÃO INTERNA (JSON Estruturado)"):
         st.json(st.session_state.dados_cliente)
